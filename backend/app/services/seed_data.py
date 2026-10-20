@@ -372,4 +372,9 @@ async def seed_initial_data(db: AsyncSession) -> bool:
         db.add(st)
 
     await db.commit()
+
+    # 10. Seed Deterministic Causal Graph & Blast Radius Report
+    from app.services.causal_engine import CausalGraphEngine
+    await CausalGraphEngine.ensure_baseline_graph(db, "rel-2026-001")
+
     return True

@@ -249,6 +249,109 @@ export interface ReleaseControlStatus {
   recent_audits: AuditEventItem[];
 }
 
+// Milestone 3 Causal Graph & Blast Radius Interfaces
+export interface CausalNodeItem {
+  id: string;
+  release_id?: string;
+  experiment_id?: string;
+  node_type:
+    | "service"
+    | "component"
+    | "code_change"
+    | "experiment"
+    | "runtime_event"
+    | "failure_condition"
+    | "invariant"
+    | "observed_consequence"
+    | "hypothesized_downstream_effect"
+    | "remediation_candidate"
+    | "verification_evidence";
+  label: string;
+  description?: string;
+  severity: "normal" | "warning" | "critical" | "verified" | "mitigated";
+  status: string;
+  provenance_type: "git_commit" | "runtime_trace" | "static_architecture" | "invariant_assertion" | "duo_audit" | "empirical_ledger" | "unknown";
+  provenance_id?: string;
+  metadata_json: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface CausalEdgeItem {
+  id: string;
+  release_id?: string;
+  source_node_id: string;
+  target_node_id: string;
+  relation_type: "triggers" | "violates" | "mitigates" | "propagates_to" | "evidenced_by" | "hypothesizes" | "affects";
+  classification: "OBSERVED" | "EXPERIMENTALLY_SUPPORTED" | "INFERRED" | "UNKNOWN";
+  confidence_score: number;
+  evidence_id?: string;
+  explanation?: string;
+  is_active_in_variant: "vulnerable" | "repaired" | "both";
+  metadata_json: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface CausalGraphData {
+  release_id: string;
+  variant: "vulnerable" | "repaired" | "both";
+  nodes: CausalNodeItem[];
+  edges: CausalEdgeItem[];
+  total_nodes: number;
+  total_edges: number;
+  experimentally_supported_edges: number;
+  inferred_edges: number;
+  observed_edges: number;
+  active_invariants: string[];
+}
+
+export interface BlastRadiusReportItem {
+  release_id: string;
+  experiment_id?: string;
+  scenario_id?: string;
+  severity: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+  directly_affected_services: string[];
+  downstream_affected_services: string[];
+  violated_invariants: string[];
+  affected_transaction_count: number;
+  financial_exposure_usd: number;
+  financial_exposure_cents: number;
+  mitigated_in_repaired: boolean;
+  counterfactual_delta: Record<string, unknown>;
+  confidence_basis: string;
+  assumptions: string[];
+  created_at: string;
+}
+
+export interface CounterfactualComparisonItem {
+  release_id: string;
+  scenario_id: string;
+  vulnerable_blast_radius: BlastRadiusReportItem;
+  repaired_blast_radius: BlastRadiusReportItem;
+  mitigated_consequences: string[];
+  preserved_invariants: string[];
+  eliminated_financial_risk_usd: number;
+  causal_fix_verification: string;
+}
+
+export interface CausalPathStepItem {
+  step_index: number;
+  node: CausalNodeItem;
+  edge_to_next?: CausalEdgeItem;
+  explanation: string;
+}
+
+export interface CausalPathTraceItem {
+  source_node_id: string;
+  target_node_id: string;
+  path_found: boolean;
+  path_length: number;
+  highest_severity: "normal" | "warning" | "critical";
+  is_experimentally_proven: boolean;
+  steps: CausalPathStepItem[];
+  root_cause_node_id?: string;
+  mitigating_remediation_id?: string;
+}
+
 // Fetch helper with standard timeout and error handling
 async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${path}`;
@@ -312,4 +415,20 @@ export const api = {
     fetchApi<TimeMachineComparison>(`/api/v1/experiments/${id}/comparison`),
   getExperimentLedger: (id: string) =>
     fetchApi<TransactionItem[]>(`/api/v1/experiments/${id}/ledger`),
+
+  // Milestone 3 Causal Graph & Blast Radius APIs
+  getCausalGraph: (releaseId: string, variant: "vulnerable" | "repaired" | "both" = "vulnerable") =>
+    fetchApi<CausalGraphData>(`/api/v1/investigation/${releaseId}/causal-graph?variant=${variant}`),
+  getBlastRadius: (releaseId: string, experimentId?: string) =>
+    fetchApi<BlastRadiusReportItem>(
+      `/api/v1/investigation/${releaseId}/blast-radius${experimentId ? `?experiment_id=${experimentId}` : ""}`
+    ),
+  getCounterfactualComparison: (releaseId: string, scenarioId = "lost-response-retry") =>
+    fetchApi<CounterfactualComparisonItem>(
+      `/api/v1/investigation/${releaseId}/counterfactual?scenario_id=${scenarioId}`
+    ),
+  traceCausalPath: (releaseId: string, sourceNodeId: string, targetNodeId: string, maxDepth = 10) =>
+    fetchApi<CausalPathTraceItem>(
+      `/api/v1/investigation/${releaseId}/trace-path?source_node_id=${sourceNodeId}&target_node_id=${targetNodeId}&max_depth=${maxDepth}`
+    ),
 };

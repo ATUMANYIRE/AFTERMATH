@@ -134,11 +134,12 @@ pytest -v
 ```
 Output:
 ```
-tests/test_endpoints.py ......                                           [ 35%]
-tests/test_experiments.py ......                                         [ 70%]
-tests/test_health.py ..                                                  [ 82%]
+tests/test_causal_engine.py .......                                      [ 29%]
+tests/test_endpoints.py ......                                           [ 54%]
+tests/test_experiments.py ......                                         [ 79%]
+tests/test_health.py ..                                                  [ 87%]
 tests/test_synthetic_payment.py ...                                      [100%]
-============================= 17 passed in 1.15s ==============================
+============================= 24 passed in 1.45s ==============================
 ```
 
 ### Run Frontend Typecheck & Playwright E2E
@@ -146,9 +147,22 @@ tests/test_synthetic_payment.py ...                                      [100%]
 # Typecheck
 npm run typecheck
 
-# Playwright End-to-End Suite
+# Playwright End-to-End Suite (2 passing tests)
 npx playwright test
 ```
+
+---
+
+## Causal Graph & Blast Radius Intelligence
+
+AFTERMATH features a typed, persistent directed causal graph and blast-radius intelligence engine:
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| `/api/v1/investigation/{release_id}/causal-graph` | GET | Persistent directed topology with epistemic classifications (`OBSERVED`, `EXPERIMENTALLY_SUPPORTED`, `INFERRED`, `UNKNOWN`). |
+| `/api/v1/investigation/{release_id}/blast-radius` | GET | Deterministic impact calculation: direct services, downstream cascades, and dollar exposure. |
+| `/api/v1/investigation/{release_id}/counterfactual` | GET | Side-by-side blast radius comparison between vulnerable and repaired releases. |
+| `/api/v1/investigation/{release_id}/trace-path` | GET / POST | Cycle-safe bounded BFS causal path discovery from code changes to broken invariants. |
 
 ---
 
@@ -196,12 +210,15 @@ AFTERMATH supports real GitLab Duo agents. To enable live Duo integrations:
 
 ## Repository Setup & Competition Links
 
-- **Canonical GitLab Repository**: [https://gitlab.com/atumanyire/aftermath](https://gitlab.com/atumanyire/aftermath) *(Required for the GitLab Life After Code Hackathon)*
+- **Canonical GitLab Repository**: [https://gitlab.com/atumanyire-labs/aftermath](https://gitlab.com/atumanyire-labs/aftermath) *(Required for the GitLab Life After Code Hackathon)*
 - **GitHub Mirror**: [https://github.com/ATUMANYIRE/AFTERMATH.git](https://github.com/ATUMANYIRE/AFTERMATH.git)
 - **Architecture Documentation**: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - **Milestone 1 Acceptance Report**: [`docs/MILESTONE_1_ACCEPTANCE.md`](docs/MILESTONE_1_ACCEPTANCE.md)
 - **Milestone 2 Baseline Audit**: [`docs/M2_BASELINE_AUDIT.md`](docs/M2_BASELINE_AUDIT.md)
 - **Milestone 2 Acceptance Report**: [`docs/MILESTONE_2_ACCEPTANCE.md`](docs/MILESTONE_2_ACCEPTANCE.md)
+- **Milestone 3 Baseline Audit**: [`docs/M3_BASELINE.md`](docs/M3_BASELINE.md)
+- **Milestone 3 Acceptance Report**: [`docs/MILESTONE_3_ACCEPTANCE.md`](docs/MILESTONE_3_ACCEPTANCE.md)
+- **GitLab Duo Integration & Blocker Report**: [`docs/GITLAB_DUO_INTEGRATION.md`](docs/GITLAB_DUO_INTEGRATION.md)
 
 ---
 

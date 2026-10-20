@@ -1,0 +1,78 @@
+# GitLab Duo Agent Platform Specification: Consequence Auditor Agent
+# Schema Version: 2026-03 (GitLab Duo Custom Agents & Workflows)
+apiVersion: duo.gitlab.com/v1alpha1
+kind: DuoAgent
+metadata:
+  name: consequence-auditor
+  namespace: atumanyire-labs/aftermath
+  displayName: "GitLab Duo Consequence Auditor"
+  version: "1.2.0"
+  description: "Automated DevSecOps agent that inspects merge request diffs, identifies safety invariants, triggers bounded counterfactual sandbox simulations, and generates blast-radius causal reports."
+
+spec:
+  model: "claude-3-5-sonnet"
+  temperature: 0.1
+
+  triggers:
+    - event: merge_request.opened
+      target_branches: ["main", "release/*"]
+    - event: merge_request.synchronize
+    - event: manual_pipeline_dispatch
+      inputs:
+        - name: scenario_id
+          type: string
+          default: "lost-response-retry"
+        - name: bounded_concurrency
+          type: integer
+          default: 5
+
+  permissions:
+    scopes:
+      - "read_repository"
+      - "read_api"
+      - "create_merge_request_note"
+      - "trigger_pipeline"
+
+  tools:
+    - name: "aftermath_consequence_sandbox"
+      description: "Dispatches a bounded counterfactual experiment simulation against isolated synthetic services."
+      endpoint: "http://aftermath-backend:8000/api/v1/experiments/run-pair"
+      method: "POST"
+      parameters:
+        release_id:
+          type: string
+          required: true
+        scenario_id:
+          type: string
+          required: true
+        concurrency:
+          type: integer
+          default: 5
+        seed:
+          type: integer
+          default: 42
+
+    - name: "aftermath_causal_path_tracer"
+      description: "Traces directed causal failure paths from code diff to downstream observed consequences."
+      endpoint: "http://aftermath-backend:8000/api/v1/investigation/{release_id}/trace-path"
+      method: "GET"
+
+    - name: "aftermath_blast_radius_calculator"
+      description: "Computes financial exposure in synthetic USD and affected services."
+      endpoint: "http://aftermath-backend:8000/api/v1/investigation/{release_id}/blast-radius"
+      method: "GET"
+
+  systemPrompt: |
+    You are the GitLab Duo Consequence Auditor for AFTERMATH: The Release Time Machine.
+    Your mission is to prevent production consequences before release candidate promotion.
+
+    CRITICAL RULES:
+    1. NEVER declare correlation as causation without controlled counterfactual evidence.
+    2. Enforce invariant: ONE LOGICAL PURCHASE MUST NOT PRODUCE MULTIPLE CHARGES (INV-PAY-001).
+    3. If transient network retry or race condition yields multiple settled debits, flag status as CRITICAL FAIL.
+    4. Provide the exact blast radius (directly affected services, downstream dependencies, and dollar exposure).
+    5. Summarize evidence with explicit file, line, and transaction references.
+
+  outputFormat:
+    format: "markdown"
+    postAs: "merge_request_comment"

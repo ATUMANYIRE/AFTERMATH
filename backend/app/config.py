@@ -49,7 +49,7 @@ class Settings(BaseSettings):
 
     # GitLab Duo & DevSecOps Platform Integration
     GITLAB_INSTANCE_URL: str = "https://gitlab.com"
-    GITLAB_PROJECT_PATH: str = "atumanyire/aftermath"
+    GITLAB_PROJECT_PATH: str = "atumanyire-labs/aftermath"
     GITLAB_ACCESS_TOKEN: str = ""
     GITLAB_DUO_ENABLED: bool = False
 

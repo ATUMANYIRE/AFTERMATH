@@ -69,6 +69,17 @@ async function capture() {
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(OUT_DIR, `investigation_${vp.label}.png`), fullPage: true });
 
+    // If desktop, trigger Causal Path Trace and capture the highlighted path view!
+    if (vp.label === "desktop") {
+      console.log("Triggering Trace Duplicate Debit Causal Path on desktop...");
+      const traceBtn = page.locator("button:has-text('Trace Duplicate Debit Causal Path')");
+      if (await traceBtn.isVisible()) {
+        await traceBtn.click();
+        await page.waitForTimeout(1500);
+        await page.screenshot({ path: path.join(OUT_DIR, `investigation_path_desktop.png`), fullPage: true });
+      }
+    }
+
     // 5. Agent Activity
     console.log(`Capturing agent_activity (${vp.label})...`);
     await page.goto("http://localhost:3000/agent-activity", { waitUntil: "networkidle", timeout: 20000 });

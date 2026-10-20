@@ -1,10 +1,14 @@
 """
 Configuration settings for AFTERMATH backend.
 """
+from pathlib import Path
 from typing import List, Union
 from pydantic import AnyHttpUrl, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import json
+
+_BASE_DIR = Path(__file__).resolve().parent.parent
+_DEFAULT_DB_FILE = (_BASE_DIR / "aftermath.db").as_posix()
 
 
 class Settings(BaseSettings):
@@ -22,7 +26,7 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api/v1"
 
     # SQLite for zero-dep local quickstart, or PostgreSQL for production / Docker Compose
-    DATABASE_URL: str = "sqlite+aiosqlite:///./aftermath.db"
+    DATABASE_URL: str = f"sqlite+aiosqlite:///{_DEFAULT_DB_FILE}"
 
     # CORS Configuration
     CORS_ORIGINS: List[str] = [

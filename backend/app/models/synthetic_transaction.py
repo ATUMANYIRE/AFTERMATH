@@ -3,7 +3,7 @@ SyntheticTransaction domain model.
 Represents transactions processed by the isolated synthetic payment service during release consequence testing.
 """
 from datetime import datetime
-from sqlalchemy import Column, String, Integer, DateTime, Boolean, JSON, Float
+from sqlalchemy import Column, String, Integer, DateTime, Boolean, JSON, Float, ForeignKey
 from app.database import Base
 
 
@@ -11,12 +11,14 @@ class SyntheticTransaction(Base):
     __tablename__ = "synthetic_transactions"
 
     id = Column(String(64), primary_key=True, index=True)
+    experiment_id = Column(String(64), ForeignKey("experiments.id", ondelete="CASCADE"), nullable=True, index=True)
+    order_id = Column(String(64), nullable=True, index=True)  # Represents the logical purchase
     transaction_ref = Column(String(64), nullable=False, unique=True, index=True)
     idempotency_key = Column(String(128), nullable=True, index=True)
     customer_id = Column(String(64), nullable=False, index=True)
     amount_cents = Column(Integer, nullable=False)
     currency = Column(String(3), nullable=False, default="USD")
-    status = Column(String(32), nullable=False)  # settled, rejected, duplicate_detected, race_corrupted
+    status = Column(String(32), nullable=False)  # settled, duplicate_detected, race_corrupted, rejected, failed
     latency_ms = Column(Float, nullable=False, default=45.0)
     is_duplicate = Column(Boolean, nullable=False, default=False)
     has_anomaly = Column(Boolean, nullable=False, default=False)

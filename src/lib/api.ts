@@ -1,5 +1,6 @@
 /**
  * AFTERMATH API Client & TypeScript Interfaces
+ * Milestone 2 — The Consequence Laboratory
  */
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -68,6 +69,35 @@ export interface EvidenceItem {
   created_at: string;
 }
 
+export interface TransactionItem {
+  id: string;
+  experiment_id?: string;
+  order_id?: string;
+  transaction_ref: string;
+  idempotency_key?: string;
+  customer_id: string;
+  amount_cents: number;
+  currency: string;
+  status: "settled" | "duplicate_detected" | "race_corrupted" | "rejected" | "failed";
+  latency_ms: number;
+  is_duplicate: boolean;
+  has_anomaly: boolean;
+  error_detail?: string;
+  release_variant: "vulnerable" | "repaired";
+  metadata_payload?: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface ScenarioConfig {
+  scenario_id: string;
+  concurrency: number;
+  retry_count: number;
+  delay_ms: number;
+  failure_rate: number;
+  order_count: number;
+  seed: number;
+}
+
 export interface ExperimentItem {
   id: string;
   release_id: string;
@@ -83,6 +113,21 @@ export interface ExperimentItem {
   metrics_summary?: Record<string, unknown>;
   gitlab_job_id?: string;
   gitlab_pipeline_id?: string;
+
+  // Milestone 2 fields
+  scenario_id?: string;
+  scenario_config?: ScenarioConfig;
+  reproducibility_seed?: number;
+  invariant_status?: "PASS" | "FAIL" | "ERROR";
+  invariant_verdict?: string;
+  ledger_summary?: {
+    total_orders_processed: number;
+    orders_violating_invariant: number;
+    financial_exposure_usd: number;
+    total_debited_usd: number;
+    legitimate_billed_usd: number;
+  };
+
   started_at: string;
   completed_at?: string;
   events: ExperimentEventItem[];
@@ -101,6 +146,8 @@ export interface TimeMachineComparison {
     latency_improvement_ratio: string;
     financial_exposure_prevented_usd: number;
     anomalies_eliminated: boolean;
+    scenario_tested?: string;
+    reproducibility_seed?: number;
     gitlab_pipeline_comparison: {
       vulnerable_pipeline_id?: string;
       repaired_pipeline_id?: string;
@@ -252,4 +299,17 @@ export const api = {
       method: "POST",
       body: JSON.stringify(action),
     }),
+
+  // Milestone 2 Consequence Laboratory APIs
+  runExperimentPair: (req: { release_id: string; scenario: ScenarioConfig }) =>
+    fetchApi<TimeMachineComparison>("/api/v1/experiments/run-pair", {
+      method: "POST",
+      body: JSON.stringify(req),
+    }),
+  getExperimentHistory: (limit = 20) =>
+    fetchApi<ExperimentItem[]>(`/api/v1/experiments/history?limit=${limit}`),
+  getExperimentComparison: (id: string) =>
+    fetchApi<TimeMachineComparison>(`/api/v1/experiments/${id}/comparison`),
+  getExperimentLedger: (id: string) =>
+    fetchApi<TransactionItem[]>(`/api/v1/experiments/${id}/ledger`),
 };

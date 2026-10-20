@@ -9,6 +9,7 @@ from app.api.investigation import router as investigation_router
 from app.api.agent_activity import router as agent_activity_router
 from app.api.release_control import router as release_control_router
 from app.api.synthetic_payment import router as synthetic_payment_router
+from app.api.experiments import router as experiments_router
 
 api_router = APIRouter()
 
@@ -20,3 +21,4 @@ api_router.include_router(investigation_router)
 api_router.include_router(agent_activity_router)
 api_router.include_router(release_control_router)
 api_router.include_router(synthetic_payment_router)
+api_router.include_router(experiments_router)

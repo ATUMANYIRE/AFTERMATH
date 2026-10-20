@@ -9,6 +9,7 @@ from app.models.agent_session import AgentSession
 from app.models.approval import Approval
 from app.models.audit_event import AuditEvent
 from app.models.synthetic_transaction import SyntheticTransaction
+from app.models.idempotency_record import IdempotencyRecord
 
 __all__ = [
     "Release",
@@ -19,4 +20,5 @@ __all__ = [
     "Approval",
     "AuditEvent",
     "SyntheticTransaction",
+    "IdempotencyRecord",
 ]

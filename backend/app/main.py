@@ -11,6 +11,7 @@ from app.config import settings
 from app.database import engine, Base, AsyncSessionLocal
 from app.api.router import api_router
 from app.api.health import router as health_router
+from app.api.experiments import router as experiments_direct_router
 from app.services.seed_data import seed_initial_data
 
 # Configure logging
@@ -45,7 +46,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="AFTERMATH API",
     description="The Release Time Machine — Real GitLab Duo consequence testing and release supervision.",
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
 
@@ -70,6 +71,9 @@ async def global_exception_handler(request: Request, exc: Exception):
 # Root Probes (Kubernetes / Docker default paths)
 app.include_router(health_router)
 
+# Direct root experiments route /api/experiments/* conforming strictly to prompt spec
+app.include_router(experiments_direct_router, prefix="/api")
+
 # Mount main API router under prefix (e.g. /api/v1)
 app.include_router(api_router, prefix=settings.API_PREFIX)
 
@@ -79,7 +83,7 @@ async def root():
     return {
         "product": "AFTERMATH — The Release Time Machine",
         "tagline": "Every release has consequences. See them before production.",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "api_docs": "/docs",
         "health": "/healthz",
         "ready": "/readyz",

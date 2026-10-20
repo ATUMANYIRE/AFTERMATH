@@ -7,21 +7,13 @@ if (!fs.existsSync(OUT_DIR)) {
   fs.mkdirSync(OUT_DIR, { recursive: true });
 }
 
-const routes = [
-  { name: "overview", path: "/" },
-  { name: "time_machine", path: "/time-machine" },
-  { name: "investigation", path: "/investigation" },
-  { name: "agent_activity", path: "/agent-activity" },
-  { name: "release_control", path: "/release-control" },
-];
-
 const viewports = [
   { label: "desktop", width: 1440, height: 900 },
   { label: "mobile", width: 390, height: 844 },
 ];
 
 async function capture() {
-  console.log("Launching Edge browser for screenshot capture...");
+  console.log("Launching Edge browser for Milestone 2 Consequence Laboratory verification...");
   const browser = await chromium.launch({
     channel: "msedge",
     headless: true,
@@ -34,24 +26,66 @@ async function capture() {
     });
     const page = await context.newPage();
 
-    for (const r of routes) {
-      const url = `http://localhost:3000${r.path}`;
-      console.log(`Capturing ${r.name} (${vp.label}) from ${url}...`);
-      try {
-        await page.goto(url, { waitUntil: "networkidle", timeout: 20000 });
-        await page.waitForTimeout(1200);
-        const filename = path.join(OUT_DIR, `${r.name}_${vp.label}.png`);
-        await page.screenshot({ path: filename, fullPage: true });
-        console.log(`Saved screenshot: ${filename}`);
-      } catch (err) {
-        console.error(`Error capturing ${r.name} (${vp.label}):`, err.message);
+    // 1. Overview
+    console.log(`Capturing overview (${vp.label})...`);
+    await page.goto("http://localhost:3000/", { waitUntil: "networkidle", timeout: 20000 });
+    await page.waitForTimeout(1000);
+    await page.screenshot({ path: path.join(OUT_DIR, `overview_${vp.label}.png`), fullPage: true });
+
+    // 2. Time Machine (Consequence Laboratory - Initial State)
+    console.log(`Capturing time_machine initial (${vp.label})...`);
+    await page.goto("http://localhost:3000/time-machine", { waitUntil: "networkidle", timeout: 20000 });
+    await page.waitForTimeout(1000);
+
+    // If desktop, trigger "Execute Experiment Pair" to show live consequence execution in action!
+    if (vp.label === "desktop") {
+      console.log("Triggering Execute Experiment Pair on desktop...");
+      const executeBtn = page.locator("button:has-text('Execute Experiment Pair')");
+      if (await executeBtn.isVisible()) {
+        await executeBtn.click();
+        // Wait for execution to finish (status changes from Executing... back to normal or results update)
+        await page.waitForTimeout(4000);
       }
     }
+
+    await page.screenshot({ path: path.join(OUT_DIR, `time_machine_${vp.label}.png`), fullPage: true });
+
+    // 3. Time Machine - Ledger Transactions Tab
+    console.log(`Capturing time_machine_ledger (${vp.label})...`);
+    try {
+      const ledgerTab = page.locator("button:has-text('Customer Ledger Transactions')");
+      if (await ledgerTab.isVisible()) {
+        await ledgerTab.click();
+        await page.waitForTimeout(1000);
+        await page.screenshot({ path: path.join(OUT_DIR, `time_machine_ledger_${vp.label}.png`), fullPage: true });
+      }
+    } catch (e) {
+      console.warn("Could not click ledger tab:", e.message);
+    }
+
+    // 4. Investigation
+    console.log(`Capturing investigation (${vp.label})...`);
+    await page.goto("http://localhost:3000/investigation", { waitUntil: "networkidle", timeout: 20000 });
+    await page.waitForTimeout(1000);
+    await page.screenshot({ path: path.join(OUT_DIR, `investigation_${vp.label}.png`), fullPage: true });
+
+    // 5. Agent Activity
+    console.log(`Capturing agent_activity (${vp.label})...`);
+    await page.goto("http://localhost:3000/agent-activity", { waitUntil: "networkidle", timeout: 20000 });
+    await page.waitForTimeout(1000);
+    await page.screenshot({ path: path.join(OUT_DIR, `agent_activity_${vp.label}.png`), fullPage: true });
+
+    // 6. Release Control
+    console.log(`Capturing release_control (${vp.label})...`);
+    await page.goto("http://localhost:3000/release-control", { waitUntil: "networkidle", timeout: 20000 });
+    await page.waitForTimeout(1000);
+    await page.screenshot({ path: path.join(OUT_DIR, `release_control_${vp.label}.png`), fullPage: true });
+
     await context.close();
   }
 
   await browser.close();
-  console.log("All screenshots captured successfully!");
+  console.log("Milestone 2 screenshots captured successfully!");
 }
 
 capture().catch((err) => {

@@ -10,11 +10,10 @@ build/
 *.tsbuildinfo
 next-env.d.ts
 
-# Testing & Browser Screenshots
+# Testing
 coverage/
 playwright-report/
 test-results/
-screenshots/
 
 # Local environment files & secrets
 .env*.local

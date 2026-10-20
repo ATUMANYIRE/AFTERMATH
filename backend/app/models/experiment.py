@@ -25,6 +25,15 @@ class Experiment(Base):
     metrics_summary = Column(JSON, nullable=True)  # Detailed metrics map
     gitlab_job_id = Column(String(64), nullable=True)
     gitlab_pipeline_id = Column(String(64), nullable=True)
+
+    # Executable Consequence Engine fields (Milestone 2)
+    scenario_id = Column(String(64), nullable=True, default="lost-response-retry")
+    scenario_config = Column(JSON, nullable=True)
+    reproducibility_seed = Column(Integer, nullable=True, default=42)
+    invariant_status = Column(String(16), nullable=True, default="PASS")  # PASS, FAIL, ERROR
+    invariant_verdict = Column(Text, nullable=True)
+    ledger_summary = Column(JSON, nullable=True)
+
     started_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     completed_at = Column(DateTime, nullable=True)
 

@@ -134,16 +134,43 @@ pytest -v
 ```
 Output:
 ```
-tests/test_endpoints.py ......                                           [ 54%]
-tests/test_health.py ..                                                  [ 72%]
+tests/test_endpoints.py ......                                           [ 35%]
+tests/test_experiments.py ......                                         [ 70%]
+tests/test_health.py ..                                                  [ 82%]
 tests/test_synthetic_payment.py ...                                      [100%]
-============================= 11 passed in 5.16s ==============================
+============================= 17 passed in 1.15s ==============================
 ```
 
-### Run Frontend Typecheck
+### Run Frontend Typecheck & Playwright E2E
 ```bash
+# Typecheck
 npm run typecheck
+
+# Playwright End-to-End Suite
+npx playwright test
 ```
+
+---
+
+## Consequence Laboratory & REST API
+
+The Consequence Laboratory exposes a deterministic fault injection and invariant verification engine:
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| `/api/v1/experiments/run` | POST | Execute a single counterfactual scenario (`lost-response-retry`, `concurrent-checkouts`, `duplicate-idempotency-keys`, `delayed-db-commit`, `transient-network-drop`). |
+| `/api/v1/experiments/run-pair` | POST | Concurrently execute vulnerable and repaired runs with identical PRNG seed. |
+| `/api/v1/experiments/{id}` | GET | Fetch experiment status, invariant result, duration, and error count. |
+| `/api/v1/experiments/{id}/events` | GET | Chronological event trace with millisecond offsets and service markers. |
+| `/api/v1/experiments/{id}/evidence` | GET | Empirical proof, log excerpts, and verification artifacts. |
+| `/api/v1/experiments/{id}/ledger` | GET | Customer-level financial ledger debits with duplicate violation detection. |
+| `/api/v1/experiments/{id}/comparison` | GET | Full side-by-side delta between paired runs. |
+| `/api/v1/experiments/history` | GET | Audit log of all completed consequence runs. |
+
+### Invariant Guarantee:
+$$\text{INVARIANT}: \quad \forall \, \text{order } o, \quad \text{settled\_charges}(o) \le 1$$
+- **Vulnerable Variant**: Violates the invariant under transient retry and race conditions ($1,500.00 in double debits).
+- **Repaired Variant**: Guarantees single-billing via durable database unique constraints on `(experiment_id, scope, idempotency_key)` and 3-phase atomic transitions (`IN_FLIGHT` $\to$ `SETTLED`).
 
 ---
 
@@ -173,6 +200,8 @@ AFTERMATH supports real GitLab Duo agents. To enable live Duo integrations:
 - **GitHub Mirror**: [https://github.com/ATUMANYIRE/AFTERMATH.git](https://github.com/ATUMANYIRE/AFTERMATH.git)
 - **Architecture Documentation**: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - **Milestone 1 Acceptance Report**: [`docs/MILESTONE_1_ACCEPTANCE.md`](docs/MILESTONE_1_ACCEPTANCE.md)
+- **Milestone 2 Baseline Audit**: [`docs/M2_BASELINE_AUDIT.md`](docs/M2_BASELINE_AUDIT.md)
+- **Milestone 2 Acceptance Report**: [`docs/MILESTONE_2_ACCEPTANCE.md`](docs/MILESTONE_2_ACCEPTANCE.md)
 
 ---
 

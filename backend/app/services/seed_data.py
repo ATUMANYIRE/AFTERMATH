@@ -82,6 +82,11 @@ async def seed_initial_data(db: AsyncSession) -> bool:
         },
         gitlab_job_id="job-881920",
         gitlab_pipeline_id="pipe-31048",
+        scenario_id="lost-response-retry",
+        reproducibility_seed=42,
+        invariant_status="FAIL",
+        invariant_verdict="VIOLATION DETECTED: 27 duplicate charges issued across 450 transactions.",
+        ledger_summary={"total_requests": 450, "unique_keys": 423, "settled_count": 450, "double_charges": 27},
         started_at=base_time - timedelta(minutes=45),
         completed_at=base_time - timedelta(minutes=44, seconds=15),
     )
@@ -110,6 +115,11 @@ async def seed_initial_data(db: AsyncSession) -> bool:
         },
         gitlab_job_id="job-882041",
         gitlab_pipeline_id="pipe-31055",
+        scenario_id="lost-response-retry",
+        reproducibility_seed=42,
+        invariant_status="PASS",
+        invariant_verdict="VERIFIED: Zero duplicate charges; all identical idempotency keys deduplicated safely.",
+        ledger_summary={"total_requests": 450, "unique_keys": 450, "settled_count": 450, "double_charges": 0},
         started_at=base_time - timedelta(minutes=25),
         completed_at=base_time - timedelta(minutes=24, seconds=18),
     )

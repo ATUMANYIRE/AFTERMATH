@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: aftermath_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aftermath
+      POSTGRES_PASSWORD: aftermath_secure_password
+      POSTGRES_DB: aftermath
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aftermath -d aftermath"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aftermath_backend
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: postgresql+asyncpg://aftermath:aftermath_secure_password@postgres:5432/aftermath
+      CORS_ORIGINS: '["http://localhost:3000","http://127.0.0.1:3000"]'
+      GITLAB_INSTANCE_URL: ${GITLAB_INSTANCE_URL:-https://gitlab.com}
+      GITLAB_PROJECT_PATH: ${GITLAB_PROJECT_PATH:-atumanyire/aftermath}
+      GITLAB_ACCESS_TOKEN: ${GITLAB_ACCESS_TOKEN:-}
+      GITLAB_DUO_ENABLED: ${GITLAB_DUO_ENABLED:-false}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: aftermath_frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -1,0 +1,255 @@
+/**
+ * AFTERMATH API Client & TypeScript Interfaces
+ */
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+export interface HealthResponse {
+  status: string;
+  environment: string;
+  database: string;
+  version: string;
+}
+
+export interface ReadinessResponse {
+  ready: boolean;
+  database_connected: boolean;
+  seed_data_loaded: boolean;
+  gitlab_duo_configured: boolean;
+  message: string;
+}
+
+export interface ReleaseItem {
+  id: string;
+  version_tag: string;
+  commit_hash: string;
+  branch: string;
+  author: string;
+  summary: string;
+  status: "investigating" | "blocked" | "verified_safe" | "approved";
+  diff_stats?: {
+    files_changed: number;
+    additions: number;
+    deletions: number;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OverviewSummary {
+  total_releases: number;
+  active_investigations: number;
+  consequences_prevented: number;
+  system_readiness_score: number;
+  releases: ReleaseItem[];
+}
+
+export interface ExperimentEventItem {
+  id: string;
+  timestamp_offset_ms: number;
+  service_name: string;
+  event_type: string;
+  level: "info" | "warning" | "error" | "critical" | "success";
+  message: string;
+  latency_ms?: number;
+  payload?: Record<string, unknown>;
+}
+
+export interface EvidenceItem {
+  id: string;
+  title: string;
+  category: string;
+  severity: "critical" | "high" | "medium" | "low";
+  summary: string;
+  raw_log_excerpt?: string;
+  gitlab_artifact_url?: string;
+  verified: boolean;
+  metadata_json?: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface ExperimentItem {
+  id: string;
+  release_id: string;
+  name: string;
+  description: string;
+  variant: "vulnerable" | "repaired";
+  status: string;
+  duration_seconds: number;
+  error_count: number;
+  transaction_count: number;
+  p95_latency_ms: number;
+  anomaly_detected: boolean;
+  metrics_summary?: Record<string, unknown>;
+  gitlab_job_id?: string;
+  gitlab_pipeline_id?: string;
+  started_at: string;
+  completed_at?: string;
+  events: ExperimentEventItem[];
+  evidences: EvidenceItem[];
+}
+
+export interface TimeMachineComparison {
+  release_id: string;
+  version_tag: string;
+  summary: string;
+  vulnerable_experiment: ExperimentItem;
+  repaired_experiment: ExperimentItem;
+  delta_summary: {
+    errors_prevented: number;
+    latency_improvement_ms: number;
+    latency_improvement_ratio: string;
+    financial_exposure_prevented_usd: number;
+    anomalies_eliminated: boolean;
+    gitlab_pipeline_comparison: {
+      vulnerable_pipeline_id?: string;
+      repaired_pipeline_id?: string;
+    };
+  };
+}
+
+export interface ConsequenceNode {
+  id: string;
+  label: string;
+  component_type: "service" | "database" | "cache" | "gateway" | "external_api";
+  health: "normal" | "warning" | "critical" | "degraded";
+  risk_level: "low" | "medium" | "high" | "severe";
+  description: string;
+  metrics: Record<string, unknown>;
+}
+
+export interface ConsequenceEdge {
+  id: string;
+  source: string;
+  target: string;
+  relation: string;
+  impact_detected: boolean;
+}
+
+export interface InvestigationDetail {
+  release_id: string;
+  version_tag: string;
+  commit_hash: string;
+  suspected_components: string[];
+  root_cause_hypothesis: string;
+  verification_status: string;
+  graph: {
+    nodes: ConsequenceNode[];
+    edges: ConsequenceEdge[];
+  };
+  evidence_items: EvidenceItem[];
+  synthetic_sandbox_tested: boolean;
+}
+
+export interface AgentSessionItem {
+  id: string;
+  release_id: string;
+  agent_name: string;
+  agent_role: string;
+  status: string;
+  goal: string;
+  prompt?: string;
+  summary?: string;
+  tools_invoked?: string[];
+  gitlab_duo_session_id?: string;
+  gitlab_flow_name?: string;
+  started_at: string;
+  completed_at?: string;
+}
+
+export interface AgentActivityStatus {
+  duo_connected: boolean;
+  gitlab_instance_url: string;
+  gitlab_project_path: string;
+  connection_message: string;
+  active_sessions_count: number;
+  completed_sessions_count: number;
+  sessions: AgentSessionItem[];
+}
+
+export interface ApprovalItem {
+  id: string;
+  release_id: string;
+  gate_name: string;
+  gate_type: "automated" | "human";
+  status: "pending" | "approved" | "rejected";
+  approver_name?: string;
+  approver_email?: string;
+  reason?: string;
+  required: boolean;
+  signed_at?: string;
+  created_at: string;
+}
+
+export interface AuditEventItem {
+  id: string;
+  entity_type: string;
+  entity_id: string;
+  action: string;
+  actor: string;
+  details?: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface ReleaseControlStatus {
+  release_id: string;
+  version_tag: string;
+  overall_status: string;
+  gates_passed: number;
+  gates_total: number;
+  can_promote: boolean;
+  gates: ApprovalItem[];
+  recent_audits: AuditEventItem[];
+}
+
+// Fetch helper with standard timeout and error handling
+async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
+  const url = `${API_BASE_URL}${path}`;
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+
+  if (!res.ok) {
+    let errorMsg = `API request failed with status ${res.status}`;
+    try {
+      const errJson = await res.json();
+      if (errJson.detail) errorMsg = errJson.detail;
+    } catch {
+      // ignore
+    }
+    throw new Error(errorMsg);
+  }
+
+  return res.json();
+}
+
+export const api = {
+  getHealth: () => fetchApi<HealthResponse>("/healthz"),
+  getReadiness: () => fetchApi<ReadinessResponse>("/readyz"),
+  getOverview: () => fetchApi<OverviewSummary>("/api/v1/overview"),
+  getTimeMachineComparison: (releaseId: string) =>
+    fetchApi<TimeMachineComparison>(`/api/v1/time-machine/compare/${releaseId}`),
+  getInvestigation: (releaseId: string) =>
+    fetchApi<InvestigationDetail>(`/api/v1/investigation/${releaseId}`),
+  getAgentActivity: () => fetchApi<AgentActivityStatus>("/api/v1/agent-activity"),
+  triggerAgent: (releaseId: string, goal: string) =>
+    fetchApi<AgentSessionItem>("/api/v1/agent-activity/trigger", {
+      method: "POST",
+      body: JSON.stringify({ release_id: releaseId, goal }),
+    }),
+  getReleaseControl: (releaseId: string) =>
+    fetchApi<ReleaseControlStatus>(`/api/v1/release-control/${releaseId}`),
+  signOffGate: (
+    releaseId: string,
+    gateId: string,
+    action: { status: "approved" | "rejected"; approver_name: string; approver_email: string; reason: string }
+  ) =>
+    fetchApi<ApprovalItem>(`/api/v1/release-control/${releaseId}/gates/${gateId}/action`, {
+      method: "POST",
+      body: JSON.stringify(action),
+    }),
+};

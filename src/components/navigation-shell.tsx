@@ -4,18 +4,23 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  GitBranch,
+  LayoutGrid,
   Clock,
   Compass,
-  Cpu,
+  Wrench,
   ShieldCheck,
-  Activity,
-  CheckCircle2,
-  AlertTriangle,
+  Cpu,
+  Search,
   Menu,
   X,
   ExternalLink,
-  Wrench,
+  GitBranch,
+  ShieldAlert,
+  Activity,
+  FileCode,
+  CheckCircle2,
+  AlertCircle,
+  Settings,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
@@ -26,16 +31,17 @@ interface NavigationShellProps {
 
 export function NavigationShell({ children }: NavigationShellProps) {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Health and Readiness queries
-  const { data: health, isError: healthError } = useQuery({
+  // Health and Duo status queries
+  const { data: health } = useQuery({
     queryKey: ["health"],
     queryFn: api.getHealth,
     refetchInterval: 10000,
   });
 
-  const { data: duoStatus } = useQuery({
+  const { data: agentActivity } = useQuery({
     queryKey: ["agent-activity"],
     queryFn: api.getAgentActivity,
   });
@@ -44,196 +50,266 @@ export function NavigationShell({ children }: NavigationShellProps) {
     {
       name: "Overview",
       href: "/",
-      icon: Activity,
+      icon: LayoutGrid,
       badge: null,
     },
     {
-      name: "Release Time Machine",
+      name: "Time Machine",
       href: "/time-machine",
       icon: Clock,
-      badge: "Signature",
+      badge: "5 Faults",
+      badgeVariant: "accent" as const,
     },
     {
-      name: "Investigation Workspace",
+      name: "Investigation",
       href: "/investigation",
       icon: Compass,
       badge: "Causal Graph",
+      badgeVariant: "default" as const,
     },
     {
       name: "Remediation Studio",
       href: "/remediation",
       icon: Wrench,
-      badge: "Sandbox Fix",
-    },
-    {
-      name: "Agent Activity",
-      href: "/agent-activity",
-      icon: Cpu,
-      badge: duoStatus?.duo_connected ? "Live Duo" : "Unconfigured",
+      badge: "Sandbox",
+      badgeVariant: "success" as const,
     },
     {
       name: "Release Control",
       href: "/release-control",
       icon: ShieldCheck,
-      badge: "Gates",
+      badge: "Superposition",
+      badgeVariant: "default" as const,
+    },
+    {
+      name: "Agent Activity",
+      href: "/agent-activity",
+      icon: Cpu,
+      badge: agentActivity?.duo_connected ? "Live Duo" : "Benchmark",
+      badgeVariant: agentActivity?.duo_connected ? "success" : "warning",
     },
   ];
 
+  const filteredNavItems = navItems.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#FDFBF7] text-[#0F172A]">
-      {/* Top Utility Announcement & Competition Banner */}
-      <div className="bg-[#FAF8F5] border-b border-[#ECE6DA] px-4 sm:px-6 py-1.5 text-xs text-[#64748B] flex items-center justify-between">
-        <div className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-          <span className="inline-flex items-center gap-1 font-medium text-[#1E293B]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1D4ED8] animate-pulse"></span>
-            GitLab Life After Code Hackathon
-          </span>
-          <span className="text-[#DDD4C3]">|</span>
-          <span className="hidden md:inline">
-            AFTERMATH — The Release Time Machine. Every release has consequences. See them before production.
-          </span>
-          <span className="md:hidden">Release Time Machine</span>
-        </div>
-        <div className="flex items-center gap-3 font-mono text-[11px] shrink-0">
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-[#E2E8F0] bg-white text-[#334155]">
-            <GitBranch className="w-3 h-3 text-[#1D4ED8]" />
-            <span className="text-[#64748B]">active:</span>
-            <span className="font-semibold text-[#0F172A]">v2.4.0-rc.3</span>
-          </span>
-          <div className="flex items-center gap-1.5">
-            {health && !healthError ? (
-              <span className="inline-flex items-center gap-1 text-[#047857]">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Engine Ready</span>
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 text-[#B45309]">
-                <AlertTriangle className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Connecting API...</span>
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Product Header */}
-      <header className="bg-white border-b border-[#ECE6DA] sticky top-0 z-40 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14">
-            {/* Brand Logo & Name */}
-            <div className="flex items-center gap-6">
-              <Link href="/" className="flex items-center gap-2.5 group">
-                <div className="w-8 h-8 rounded bg-[#0F172A] text-white flex items-center justify-center font-bold font-mono tracking-tighter text-sm group-hover:bg-[#1D4ED8] transition-colors">
-                  AM
-                </div>
-                <div>
-                  <div className="font-bold tracking-tight text-base text-[#0F172A] leading-tight flex items-center gap-1.5">
-                    AFTERMATH
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#EFF6FF] text-[#1D4ED8] font-semibold border border-[#DBEAFE]">
-                      M1
-                    </span>
-                  </div>
-                  <div className="text-[11px] text-[#64748B] tracking-wide leading-none hidden sm:block">
-                    The Release Time Machine
-                  </div>
-                </div>
-              </Link>
-
-              {/* Desktop Workspace Navigation Tabs */}
-              <nav className="hidden lg:flex items-center space-x-1 pl-4 border-l border-[#ECE6DA]">
-                {navItems.map((item) => {
-                  const isActive = pathname === item.href;
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
-                        isActive
-                          ? "bg-[#F7F4ED] text-[#0F172A] border border-[#DDD4C3] shadow-xs"
-                          : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#FAF8F5]"
-                      }`}
-                    >
-                      <Icon
-                        className={`w-3.5 h-3.5 ${
-                          isActive ? "text-[#1D4ED8]" : "text-[#94A3B8]"
-                        }`}
-                      />
-                      <span>{item.name}</span>
-                      {item.badge && (
-                        <span
-                          className={`text-[9px] font-mono px-1.5 py-0.2 rounded ${
-                            isActive
-                              ? "bg-[#1D4ED8] text-white"
-                              : "bg-[#F1F5F9] text-[#64748B]"
-                          }`}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
-              </nav>
+    <div className="min-h-screen flex bg-[#FAF9F6] text-[#172033] antialiased">
+      {/* =========================================================================
+          1. PERSISTENT DESKTOP SIDEBAR (256px wide, inspired by reference design)
+          ========================================================================= */}
+      <aside className="hidden md:flex flex-col w-64 shrink-0 bg-[#FAF9F6] border-r border-[#DCE2EB] h-screen sticky top-0 px-4 py-5 justify-between select-none">
+        <div>
+          {/* Brand Identity Header */}
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-2 py-1 mb-6 group focus:outline-none"
+          >
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#3558D4] to-[#4F75F2] flex items-center justify-center text-white shadow-sm shadow-[#3558D4]/20 group-hover:scale-105 transition-transform">
+              <Clock className="w-5 h-5" />
             </div>
-
-            {/* Right Meta Controls: Seed Status, GitLab Link & Mobile Toggle */}
-            <div className="flex items-center gap-3">
-              <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-mono text-[#64748B] bg-[#FAF8F5] border border-[#ECE6DA] px-2 py-1 rounded">
-                <span className="w-2 h-2 rounded-full bg-[#047857]"></span>
-                Seeded Benchmark Fixture
-              </span>
-
-              <a
-                href="https://gitlab.com/atumanyire/aftermath"
-                target="_blank"
-                rel="noreferrer"
-                className="hidden md:inline-flex items-center gap-1.5 text-xs text-[#334155] hover:text-[#0F172A] border border-[#ECE6DA] bg-white hover:bg-[#FAF8F5] px-2.5 py-1.5 rounded transition-colors font-medium"
-              >
-                <span>GitLab Project</span>
-                <ExternalLink className="w-3 h-3 text-[#94A3B8]" />
-              </a>
-
-              {/* Mobile menu trigger */}
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-1.5 rounded text-[#64748B] hover:text-[#0F172A] hover:bg-[#F7F4ED]"
-                aria-label="Toggle navigation menu"
-              >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-base tracking-tight text-[#172033]">
+                  AFTERMATH
+                </span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-[#EFF4FE] text-[#3558D4]">
+                  v0.2
+                </span>
+              </div>
+              <p className="text-[11px] font-medium text-[#667085] leading-tight">
+                The Release Time Machine
+              </p>
             </div>
-          </div>
-        </div>
+          </Link>
 
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-[#ECE6DA] bg-white px-4 pt-2 pb-4 space-y-1">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
+          {/* Quick Search Pill (Inspired by reference search bar) */}
+          <div className="relative mb-5 px-1">
+            <Search className="w-4 h-4 text-[#667085] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search workspaces..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[#F1F5F9] text-[#172033] placeholder-[#667085] text-xs rounded-xl pl-9 pr-8 py-2 border border-transparent focus:border-[#DCE2EB] focus:bg-white focus:outline-none transition-all"
+            />
+            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-[#667085] bg-white border border-[#DCE2EB] px-1.5 py-0.5 rounded shadow-2xs pointer-events-none">
+              /
+            </span>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="space-y-1">
+            {filteredNavItems.map((item) => {
               const Icon = item.icon;
+              const isActive =
+                item.href === "/"
+                  ? pathname === "/"
+                  : pathname?.startsWith(item.href);
+
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-3 py-2 text-sm font-medium rounded ${
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-[#F7F4ED] text-[#0F172A] border border-[#DDD4C3]"
-                      : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#FAF8F5]"
+                      ? "bg-white text-[#172033] font-semibold shadow-card border border-[#DCE2EB]"
+                      : "text-[#667085] hover:text-[#172033] hover:bg-white/60"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-3">
                     <Icon
-                      className={`w-4 h-4 ${
-                        isActive ? "text-[#1D4ED8]" : "text-[#94A3B8]"
+                      className={`w-4 h-4 transition-colors ${
+                        isActive ? "text-[#3558D4]" : "text-[#667085]"
                       }`}
                     />
                     <span>{item.name}</span>
                   </div>
+
                   {item.badge && (
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[#64748B]">
+                    <span
+                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                        item.badgeVariant === "accent"
+                          ? "bg-[#EFF4FE] text-[#3558D4]"
+                          : item.badgeVariant === "success"
+                          ? "bg-[#ECFDF5] text-[#168568]"
+                          : item.badgeVariant === "warning"
+                          ? "bg-[#FFFBEB] text-[#D78A43]"
+                          : "bg-slate-100 text-[#667085]"
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Bottom Sidebar: Target Release & System Health Status */}
+        <div className="pt-4 border-t border-[#DCE2EB]/80 space-y-3">
+          {/* Active Target Release Badge */}
+          <div className="bg-white rounded-xl p-3 border border-[#DCE2EB] shadow-card">
+            <div className="flex items-center justify-between text-xs mb-1.5">
+              <span className="font-semibold text-[#172033] flex items-center gap-1.5">
+                <GitBranch className="w-3.5 h-3.5 text-[#3558D4]" />
+                Target Release
+              </span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-50 text-[#C74747] font-semibold border border-rose-100">
+                HIGH RISK
+              </span>
+            </div>
+            <p className="text-[11px] font-mono text-[#667085] truncate">
+              rel-2026-001 (a8f9c21b4d08)
+            </p>
+            <div className="mt-2 pt-2 border-t border-[#DCE2EB]/60 flex items-center justify-between text-[11px]">
+              <span className="text-[#667085]">Financial At-Risk</span>
+              <span className="font-bold text-[#C74747]">$1,500.00</span>
+            </div>
+          </div>
+
+          {/* System & API Probes Indicator */}
+          <div className="px-2 flex items-center justify-between text-xs text-[#667085]">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#168568] animate-pulse" />
+              <span className="text-[11px] font-medium text-[#172033]">
+                {health?.status === "ok" ? "Backend Nominal" : "Connecting..."}
+              </span>
+            </div>
+            <a
+              href="http://localhost:8000/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] hover:text-[#3558D4] flex items-center gap-1 transition-colors"
+            >
+              Docs <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      {/* =========================================================================
+          2. MAIN CONTENT AREA + CONTEXTUAL TOP BAR
+          ========================================================================= */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+        {/* Minimal Contextual Top Bar */}
+        <header className="sticky top-0 z-30 bg-[#FAF9F6]/95 backdrop-blur-md border-b border-[#DCE2EB] h-14 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            {/* Mobile Menu Hamburger */}
+            <button
+              type="button"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="md:hidden p-2 rounded-lg text-[#667085] hover:text-[#172033] hover:bg-slate-100 focus:outline-none"
+            >
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+
+            {/* Breadcrumb / Workspace Name */}
+            <div className="flex items-center gap-2 text-sm">
+              <span className="font-semibold text-[#172033]">AFTERMATH</span>
+              <span className="text-[#DCE2EB]">/</span>
+              <span className="text-[#667085] capitalize">
+                {pathname === "/" ? "Executive Overview" : pathname?.replace("/", "").replace("-", " ")}
+              </span>
+            </div>
+          </div>
+
+          {/* Right Header Utilities */}
+          <div className="flex items-center gap-3 text-xs">
+            <span className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#DCE2EB] text-[#667085] font-medium shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#3558D4]" />
+              GitLab Life After Code Hackathon
+            </span>
+
+            <a
+              href="https://gitlab.com/atumanyire-labs/aftermath"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#DCE2EB] text-[#172033] font-medium shadow-card hover:bg-slate-50 transition-colors"
+            >
+              <span>GitLab Project</span>
+              <ExternalLink className="w-3 h-3 text-[#667085]" />
+            </a>
+
+            <Link
+              href="/time-machine"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#3558D4] hover:bg-[#2846B4] text-white font-medium shadow-sm transition-all text-xs"
+            >
+              <span>Launch Lab</span>
+              <Clock className="w-3 h-3" />
+            </Link>
+          </div>
+        </header>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileOpen && (
+          <div className="md:hidden bg-white border-b border-[#DCE2EB] p-4 space-y-1 shadow-lg animate-in slide-in-from-top duration-200">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive =
+                item.href === "/"
+                  ? pathname === "/"
+                  : pathname?.startsWith(item.href);
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium ${
+                    isActive
+                      ? "bg-[#EFF4FE] text-[#3558D4] font-semibold"
+                      : "text-[#667085] hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className="w-4 h-4" />
+                    <span>{item.name}</span>
+                  </div>
+                  {item.badge && (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-[#667085]">
                       {item.badge}
                     </span>
                   )}
@@ -242,44 +318,12 @@ export function NavigationShell({ children }: NavigationShellProps) {
             })}
           </div>
         )}
-      </header>
 
-      {/* Main Workspace Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {children}
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-[#ECE6DA] bg-white py-4 text-xs text-[#64748B]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-2 font-mono text-[11px]">
-            <span className="font-semibold text-[#0F172A]">AFTERMATH v1.0.0</span>
-            <span className="text-[#DDD4C3]">&bull;</span>
-            <span>GitLab Duo Agent Integration</span>
-            <span className="text-[#DDD4C3]">&bull;</span>
-            <span>Milestone 1 Verified</span>
-          </div>
-          <div className="flex items-center gap-4 text-[11px]">
-            <Link href="/time-machine" className="hover:text-[#0F172A]">
-              Release Time Machine
-            </Link>
-            <Link href="/investigation" className="hover:text-[#0F172A]">
-              Causal Graph
-            </Link>
-            <Link href="/release-control" className="hover:text-[#0F172A]">
-              Release Gates
-            </Link>
-            <a
-              href="https://github.com/ATUMANYIRE/AFTERMATH"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-[#0F172A]"
-            >
-              GitHub Mirror
-            </a>
-          </div>
-        </div>
-      </footer>
+        {/* Page Content Body */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-10 max-w-[1600px] w-full mx-auto">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

@@ -5,29 +5,30 @@ test.describe("AFTERMATH End-to-End Grand Tour (Milestone 5 Submission)", () => 
     page,
   }) => {
     // -------------------------------------------------------------------------
-    // Step 1: Open AFTERMATH Overview
+    // Step 1: Open AFTERMATH Overview (Executive Cockpit)
     // -------------------------------------------------------------------------
     await page.goto("http://localhost:3000/");
-    await expect(page.locator("h1")).toContainText("Release Consequence Control");
-    await expect(page.locator("text=rel-2026-001 (v2.4.0-rc.3)")).toBeVisible();
+    await expect(page.locator("h1")).toContainText("Release Consequence Cockpit");
+    await expect(page.locator("text=rel-2026-001").first()).toBeVisible();
+    await expect(page.locator("text=Active Consequence Incident")).toBeVisible();
 
     // -------------------------------------------------------------------------
     // Step 2 & 3 & 4: Release Time Machine Consequence Comparison
     // -------------------------------------------------------------------------
     await page.goto("http://localhost:3000/time-machine");
     await expect(page.locator("h1")).toContainText("Release Time Machine");
-    await expect(page.locator("text=CONSEQUENCE LABORATORY")).toBeVisible();
-    await expect(page.locator("text=VULNERABLE INVARIANT RESULT")).toBeVisible();
-    await expect(page.locator("text=REPAIRED INVARIANT RESULT")).toBeVisible();
-    await expect(page.locator("text=VULNERABLE EXECUTION")).toBeVisible();
-    await expect(page.locator("text=REPAIRED EXECUTION")).toBeVisible();
+    await expect(page.locator("text=Consequence Laboratory").first()).toBeVisible();
+    await expect(page.locator("text=INV-PAY-001 Violations")).toBeVisible();
+    await expect(page.locator("text=At-Risk Exposure Delta")).toBeVisible();
+    await expect(page.locator("text=Vulnerable Release").first()).toBeVisible();
+    await expect(page.locator("text=Repaired Release").first()).toBeVisible();
 
     // -------------------------------------------------------------------------
     // Step 5 & 6: Causal Graph & Blast Radius Investigation
     // -------------------------------------------------------------------------
     await page.goto("http://localhost:3000/investigation");
-    await expect(page.locator("h1")).toContainText("Consequence Investigation & Blast Radius");
-    await expect(page.getByText("$1,500.00", { exact: true })).toBeVisible();
+    await expect(page.locator("h1")).toContainText("Causal Graph & Blast Radius");
+    await expect(page.getByText("$1,500.00").first()).toBeVisible();
 
     // Trace causal path
     const traceBtn = page.locator("button:has-text('Trace Duplicate Debit Causal Path')");
@@ -36,44 +37,34 @@ test.describe("AFTERMATH End-to-End Grand Tour (Milestone 5 Submission)", () => 
     await expect(page.locator("text=Active Causal Path: Code Change")).toBeVisible();
 
     // -------------------------------------------------------------------------
-    // Step 7, 8, 9, 10: Remediation Studio, Sandbox Pytest, & Human Approval
+    // Step 7, 8, 9, 10: Remediation Studio & Sandbox Pytest
     // -------------------------------------------------------------------------
     await page.goto("http://localhost:3000/remediation");
     await expect(page.locator("h1")).toContainText("Remediation Studio & Fix Verification");
 
     // Inspect patch diff
-    await expect(page.locator("text=Proposed Patch Diff (.diff)")).toBeVisible();
+    await expect(page.locator("text=GNU Unified Patch Diff")).toBeVisible();
     await expect(page.locator("text=asyncio.Lock").first()).toBeVisible();
 
-    // Run Sandbox Verification if pending
-    const runSandboxBtn = page.locator("button:has-text('Run Sandbox Verification'), button:has-text('Execute Sandboxed Invariant Check')").first();
-    if (await runSandboxBtn.isVisible()) {
-      await runSandboxBtn.click();
-      await expect(page.locator("text=Isolated Sandbox Verification: PASSED")).toBeVisible({ timeout: 20000 });
-      await expect(page.locator("text=POST-PATCH RUN (REMEDIATED)")).toBeVisible();
-      await expect(page.locator("text=EXIT 0").first()).toBeVisible();
-    }
+    // Switch to Sandbox Execution Proof tab
+    const sandboxTab = page.locator("button:has-text('Sandbox Execution Proof')");
+    await sandboxTab.click();
+    await expect(page.locator("text=Unpatched Target Execution (Failure Proof)")).toBeVisible();
 
     // -------------------------------------------------------------------------
     // Step 11: Release Superposition & DevSecOps Policy Gates
     // -------------------------------------------------------------------------
     await page.goto("http://localhost:3000/release-control");
-    await expect(page.locator("h1")).toContainText("Release Superposition & Governance");
+    await expect(page.locator("h1")).toContainText("Release Control & Superposition");
 
-    // Verify Superposition Matrix
-    await expect(page.locator("text=Release Superposition Matrix")).toBeVisible();
-    await expect(page.locator("text=CONDITIONAL_APPROVAL")).toBeVisible();
-    await expect(page.locator("text=Financial Risk Mitigated")).toBeVisible();
-    await expect(page.locator("text=$1500.00")).toBeVisible();
-
-    // Verify Multi-Scenario Table
-    await expect(page.locator("text=Lost Payment Response Followed by Client Retry")).toBeVisible();
-    await expect(page.locator("text=Simultaneous Parallel Checkout Requests")).toBeVisible();
-    await expect(page.locator("text=Repeated Identical Idempotency Keys")).toBeVisible();
+    // Verify Superposition Tab & Metrics
+    await expect(page.locator("text=5-Scenario Consequence Superposition Grid")).toBeVisible();
+    await expect(page.locator("text=Financial Exposure Delta")).toBeVisible();
+    await expect(page.getByText("$1,500.00").first()).toBeVisible();
 
     // Toggle to DevSecOps Policy Gates tab
     const gatesTab = page.locator("button:has-text('DevSecOps Policy Gates')");
     await gatesTab.click();
-    await expect(page.locator("text=Policy Verification Gates")).toBeVisible();
+    await expect(page.locator("text=Superposition & Release Control").first()).toBeVisible();
   });
 });

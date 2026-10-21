@@ -11,14 +11,56 @@ import {
   ShieldCheck,
   RefreshCw,
   GitBranch,
+  FileCode,
+  ShieldAlert,
+  Info,
+  Clock,
+  Sparkles,
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, AgentActivityStatus } from "@/lib/api";
+import { StatCard } from "@/components/ui/stat-card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { SegmentedTabs } from "@/components/ui/tabs";
+
+const DUO_FLOW_AUDITOR_YAML = `name: consequence-auditor
+version: 1.0.0
+description: GitLab Duo flow for MR consequence auditing & empirical time-machine testing
+trigger:
+  event: merge_request.updated
+  paths:
+    - "services/**"
+tools:
+  - name: gitlab_git_diff
+  - name: time_machine_simulator
+  - name: causal_graph_builder
+  - name: blast_radius_analyzer
+runtime:
+  image: python:3.11-slim
+  entrypoint: aftermath-auditor`;
+
+const DUO_FLOW_REMEDIATOR_YAML = `name: remediation-engineer
+version: 1.0.0
+description: GitLab Duo flow for atomic patch synthesis and sandboxed pytest verification
+trigger:
+  event: aftermath.invariant_violated
+  invariants:
+    - INV-PAY-001
+tools:
+  - name: ast_concurrency_analyzer
+  - name: patch_generator
+  - name: isolated_sandbox_runner
+runtime:
+  image: python:3.11-slim
+  entrypoint: aftermath-remediator`;
 
 export default function AgentActivityPage() {
   const queryClient = useQueryClient();
   const [isTriggering, setIsTriggering] = useState(false);
   const [triggerStatus, setTriggerStatus] = useState<string | null>(null);
+  const [selectedFlowYaml, setSelectedFlowYaml] = useState<"auditor" | "remediator">("auditor");
 
   const { data: agentData, isLoading, isError, refetch } = useQuery<AgentActivityStatus>({
     queryKey: ["agent-activity"],
@@ -33,7 +75,7 @@ export default function AgentActivityPage() {
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["agent-activity"] });
-      setTriggerStatus("Successfully triggered Duo agent audit flow.");
+      setTriggerStatus("Triggered local benchmark flow execution.");
       setTimeout(() => setTriggerStatus(null), 4000);
     },
     onError: (err: Error) => {
@@ -52,184 +94,265 @@ export default function AgentActivityPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-28 bg-white border border-[#ECE6DA] rounded-lg"></div>
-        <div className="h-64 bg-white border border-[#ECE6DA] rounded-lg"></div>
+        <div className="h-28 bg-white rounded-2xl border border-[#DCE2EB]" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-44 bg-white rounded-2xl border border-[#DCE2EB]" />
+          ))}
+        </div>
+        <div className="h-80 bg-white rounded-2xl border border-[#DCE2EB]" />
       </div>
     );
   }
 
   if (isError || !agentData) {
     return (
-      <div className="bg-white border border-[#FECDD3] rounded-lg p-8 text-center max-w-xl mx-auto my-12">
-        <AlertCircle className="w-8 h-8 text-[#BE123C] mx-auto mb-2" />
-        <h3 className="text-base font-semibold text-[#0F172A] mb-1">
+      <div className="bg-white border border-rose-200 rounded-2xl p-10 text-center max-w-xl mx-auto my-16 shadow-card">
+        <AlertCircle className="w-8 h-8 text-[#C74747] mx-auto mb-3" />
+        <h3 className="text-lg font-semibold text-[#172033] mb-1">
           Unable to Load Agent Activity
         </h3>
-        <p className="text-sm text-[#64748B] mb-4">
+        <p className="text-sm text-[#667085] mb-6">
           Failed to fetch GitLab Duo agent sessions from backend.
         </p>
-        <button
-          onClick={() => refetch()}
-          className="px-3 py-1.5 text-xs font-medium rounded bg-[#0F172A] text-white"
-        >
-          Retry
-        </button>
+        <Button onClick={() => refetch()} variant="primary" icon={<RefreshCw className="w-4 h-4" />}>
+          Retry Query
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white border border-[#ECE6DA] rounded-lg p-6 shadow-2xs">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-[#64748B] mb-1">
-              <span>AGENT ACTIVITY WORKSPACE</span>
-              <span>&bull;</span>
-              <span className="text-[#1D4ED8] font-medium">GITLAB DUO AGENT PLATFORM</span>
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-[#0F172A] flex items-center gap-2">
-              <Cpu className="w-6 h-6 text-[#1D4ED8]" />
-              GitLab Duo Agent Activity
-            </h1>
-            <p className="text-sm text-[#475569] mt-0.5">
-              Supervise AI agent flows testing code changes, identifying consequence paths, and proposing evidence-backed fixes.
-            </p>
+    <div className="space-y-8">
+      {/* =========================================================================
+          1. HEADER SECTION
+          ========================================================================= */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EFF4FE] text-[#3558D4] border border-[#BFD5FB]/60">
+              <Cpu className="w-3 h-3 text-[#3558D4]" />
+              Agent Operations &amp; Duo Traces
+            </span>
+            <span className="text-xs text-[#667085]">|</span>
+            <span className="text-xs text-[#667085]">GitLab Flow Registry v1</span>
           </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleTrigger}
-              disabled={isTriggering}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded bg-[#1D4ED8] hover:bg-[#1E40AF] text-white shadow-xs transition-colors disabled:opacity-50"
-            >
-              {isTriggering ? (
-                <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>Triggering Flow...</span>
-                </>
-              ) : (
-                <>
-                  <Play className="w-3.5 h-3.5" />
-                  <span>Trigger Duo Audit Flow</span>
-                </>
-              )}
-            </button>
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#172033]">
+            GitLab Duo Agent Activity
+          </h1>
+          <p className="text-sm text-[#667085] mt-1 max-w-2xl leading-relaxed">
+            Supervise AI agent flows testing code changes, identifying consequence paths, and proposing evidence-backed fixes under explicit governance.
+          </p>
         </div>
 
-        {triggerStatus && (
-          <div className="mt-3 p-2.5 rounded bg-[#EFF6FF] border border-[#DBEAFE] text-xs text-[#1D4ED8] font-mono">
-            {triggerStatus}
-          </div>
-        )}
+        {/* Action Controls */}
+        <div className="flex items-center gap-3 shrink-0">
+          <Button onClick={() => refetch()} variant="outline" size="md" icon={<RefreshCw className="w-3.5 h-3.5" />}>
+            Refresh
+          </Button>
+          <Button
+            onClick={handleTrigger}
+            disabled={isTriggering}
+            variant="primary"
+            size="md"
+            icon={isTriggering ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-current" />}
+          >
+            {isTriggering ? "Triggering..." : "Trigger Benchmark Flow"}
+          </Button>
+        </div>
       </div>
 
-      {/* Honest GitLab Duo Connection State Banner */}
-      {!agentData.duo_connected ? (
-        <div className="bg-white border-2 border-[#DDD4C3] rounded-lg p-6 space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded bg-[#FFFBEB] text-[#B45309] border border-[#FDE68A] flex items-center justify-center shrink-0 mt-0.5">
-              <AlertCircle className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-[#0F172A]">
-                GitLab Duo Agent Platform — Setup &amp; Authorization Status
-              </h3>
-              <p className="text-xs text-[#475569] mt-1 leading-relaxed">
-                {agentData.connection_message}
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-[#FAF8F5] border border-[#ECE6DA] rounded-lg p-4 space-y-3 text-xs">
-            <div className="font-semibold text-[#0F172A] flex items-center gap-1.5">
-              <Terminal className="w-3.5 h-3.5 text-[#1D4ED8]" />
-              Configuration Steps for Hackathon Evaluators:
-            </div>
-            <ol className="list-decimal list-inside space-y-1.5 text-[#475569] leading-relaxed">
-              <li>
-                Ensure your authenticated GitLab account has Duo Agent Platform and Ultimate access enabled.
-              </li>
-              <li>
-                Create a Personal Access Token with <code className="font-mono text-[#0F172A] bg-white px-1 py-0.5 rounded border border-[#ECE6DA]">api</code>, <code className="font-mono text-[#0F172A] bg-white px-1 py-0.5 rounded border border-[#ECE6DA]">read_api</code>, and <code className="font-mono text-[#0F172A] bg-white px-1 py-0.5 rounded border border-[#ECE6DA]">read_repository</code> scopes.
-              </li>
-              <li>
-                Update <code className="font-mono text-[#0F172A] bg-white px-1 py-0.5 rounded border border-[#ECE6DA]">.env</code>:
-                <pre className="mt-2 p-2.5 rounded bg-[#0F172A] text-[#F8FAFC] font-mono text-[11px] overflow-x-auto">
-{`GITLAB_INSTANCE_URL=https://gitlab.com
-GITLAB_PROJECT_PATH=atumanyire/aftermath
-GITLAB_ACCESS_TOKEN=glpat-your-token-here
-GITLAB_DUO_ENABLED=true`}
-                </pre>
-              </li>
-              <li>
-                Restart the backend. Live Duo flows will execute against your GitLab repository directly.
-              </li>
-            </ol>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-[#ECFDF5] border border-[#A7F3D0] rounded-lg p-4 flex items-center justify-between text-xs text-[#065F46]">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-[#047857]" />
-            <span className="font-semibold">GitLab Duo Agent Platform Authenticated &amp; Ready</span>
-          </div>
-          <span className="font-mono">{agentData.gitlab_project_path}</span>
+      {triggerStatus && (
+        <div className="p-3 rounded-xl bg-[#EFF4FE] border border-[#BFD5FB] text-xs text-[#3558D4] font-medium flex items-center gap-2">
+          <Info className="w-4 h-4 text-[#3558D4]" />
+          <span>{triggerStatus}</span>
         </div>
       )}
 
-      {/* Execution History */}
-      <div className="bg-white border border-[#ECE6DA] rounded-lg overflow-hidden shadow-2xs">
-        <div className="px-5 py-3.5 border-b border-[#ECE6DA] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Terminal className="w-4 h-4 text-[#1D4ED8]" />
-            <h2 className="text-sm font-bold text-[#0F172A]">
-              Duo Agent Execution Traces ({agentData.sessions.length})
-            </h2>
+      {/* =========================================================================
+          2. TRANSPARENT CLOUD DUO INTEGRATION STATE CARD
+          ========================================================================= */}
+      <div className="bg-white rounded-2xl border border-[#DCE2EB] p-6 lg:p-7 shadow-card space-y-4">
+        <div className="flex items-start gap-3 pb-3 border-b border-[#DCE2EB]/80">
+          <div className="w-9 h-9 rounded-xl bg-amber-50 text-[#D78A43] border border-amber-200 flex items-center justify-center shrink-0 mt-0.5">
+            <AlertCircle className="w-5 h-5" />
           </div>
-          <span className="text-xs text-[#64748B] font-mono">
-            {agentData.completed_sessions_count} completed runs
-          </span>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-bold text-[#172033]">
+                GitLab Duo Agent Platform — Remote Authorization Status
+              </h3>
+              <Badge variant="warning" dot>BLOCKED: Phone Verification Pending</Badge>
+            </div>
+            <p className="text-xs text-[#667085] leading-relaxed">
+              {agentData.connection_message}
+            </p>
+          </div>
         </div>
 
-        <div className="divide-y divide-[#ECE6DA]">
+        <div className="bg-[#FAF9F6] border border-[#DCE2EB]/80 rounded-xl p-4 space-y-2.5 text-xs text-[#667085]">
+          <span className="font-bold text-[#172033] flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+            <Terminal className="w-3.5 h-3.5 text-[#3558D4]" />
+            Configuration Steps for Live GitLab Duo Cloud Execution:
+          </span>
+          <ol className="list-decimal list-inside space-y-1 leading-relaxed text-[11px]">
+            <li>Complete the SMS phone verification challenge on your GitLab account to unlock Duo Agent Platform.</li>
+            <li>Create a Personal Access Token with <code className="font-mono text-[#172033] bg-white px-1.5 py-0.5 rounded border border-[#DCE2EB]">api</code>, <code className="font-mono text-[#172033] bg-white px-1.5 py-0.5 rounded border border-[#DCE2EB]">read_api</code>, and <code className="font-mono text-[#172033] bg-white px-1.5 py-0.5 rounded border border-[#DCE2EB]">read_repository</code> scopes.</li>
+            <li>Set in <code className="font-mono text-[#172033] bg-white px-1.5 py-0.5 rounded border border-[#DCE2EB]">.env</code>: <code className="font-mono text-[#3558D4]">GITLAB_ACCESS_TOKEN=glpat-...</code> and <code className="font-mono text-[#3558D4]">GITLAB_DUO_ENABLED=true</code>.</li>
+            <li>Restart the backend. Live Duo flows will execute against your GitLab repository directly.</li>
+          </ol>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          3. FOUR STAT CARDS
+          ========================================================================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <StatCard
+          tag="Agent Status"
+          tagVariant="warning"
+          title="Cloud Duo Integration"
+          value="SaaS Blocked"
+          delta={{
+            value: "Pending SMS Phone Challenge",
+            isRisk: true,
+          }}
+          subStats={[
+            { label: "GitLab Group", value: "atumanyire-labs" },
+            { label: "Project", value: "aftermath" },
+          ]}
+        />
+
+        <StatCard
+          tag="Flow Registry"
+          tagVariant="accent"
+          title="Registered Duo Flows"
+          value="2 Flows"
+          delta={{
+            value: "Flow Registry v1 Specifications Committed",
+            isPositive: true,
+          }}
+          subStats={[
+            { label: "Auditor Flow", value: "consequence-auditor" },
+            { label: "Repair Flow", value: "remediation-engineer" },
+          ]}
+        />
+
+        <StatCard
+          tag="Recorded Traces"
+          tagVariant="default"
+          title="Execution Sessions"
+          value={`${agentData.sessions.length} Runs`}
+          delta={{
+            value: "Deterministic Benchmark Sessions",
+            isPositive: true,
+          }}
+          subStats={[
+            { label: "Completed", value: `${agentData.completed_sessions_count} Runs` },
+            { label: "Active", value: "0 In-Flight" },
+          ]}
+        />
+
+        <StatCard
+          tag="Tool Matrix"
+          tagVariant="success"
+          title="Registered Agent Tools"
+          value="7 Tools"
+          delta={{
+            value: "AST, Pytest, Time Machine, Diff Analyzers",
+            isPositive: true,
+          }}
+          subStats={[
+            { label: "Execution Sandbox", value: "Isolated Worktree" },
+            { label: "Timeout Bound", value: "15 Seconds" },
+          ]}
+        />
+      </div>
+
+      {/* =========================================================================
+          4. DECLARATIVE DUO FLOW SPECIFICATIONS CARD
+          ========================================================================= */}
+      <div className="bg-white rounded-2xl border border-[#DCE2EB] overflow-hidden shadow-card">
+        <div className="p-6 border-b border-[#DCE2EB] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 className="text-base font-bold text-[#172033] flex items-center gap-2">
+              <FileCode className="w-4 h-4 text-[#3558D4]" />
+              GitLab Duo Flow Registry v1 Declarations
+            </h3>
+            <p className="text-xs text-[#667085] mt-0.5">
+              Declarative agent specifications authored in .gitlab/duo/
+            </p>
+          </div>
+
+          <SegmentedTabs
+            size="sm"
+            options={[
+              { id: "auditor", label: "consequence-auditor.yaml" },
+              { id: "remediator", label: "remediation-engineer.yaml" },
+            ]}
+            activeId={selectedFlowYaml}
+            onChange={(id) => setSelectedFlowYaml(id as any)}
+          />
+        </div>
+
+        <div className="p-6 bg-slate-900 text-slate-100 font-mono text-xs overflow-x-auto">
+          <pre className="leading-relaxed">
+            {selectedFlowYaml === "auditor" ? DUO_FLOW_AUDITOR_YAML : DUO_FLOW_REMEDIATOR_YAML}
+          </pre>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          5. EXECUTION HISTORY (Explicit Benchmark Provenance)
+          ========================================================================= */}
+      <div className="bg-white rounded-2xl border border-[#DCE2EB] overflow-hidden shadow-card">
+        <div className="p-6 border-b border-[#DCE2EB] flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-[#172033]">
+              Agent Execution Traces ({agentData.sessions.length})
+            </h3>
+            <p className="text-xs text-[#667085] mt-0.5">
+              Historical agent execution records with explicit provenance labels
+            </p>
+          </div>
+          <Badge variant="default">Demo Benchmark Fixtures</Badge>
+        </div>
+
+        <div className="divide-y divide-[#DCE2EB]/70">
           {agentData.sessions.map((sess) => (
-            <div key={sess.id} className="p-5 hover:bg-[#FAF8F5]/80 transition-colors space-y-3">
+            <div key={sess.id} className="p-6 hover:bg-[#FAF9F6]/50 transition-colors space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#047857]"></span>
-                  <span className="font-bold text-xs text-[#0F172A]">{sess.agent_name}</span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#EFF6FF] text-[#1D4ED8] border border-[#DBEAFE]">
-                    {sess.agent_role}
-                  </span>
+                  <span className="w-2 h-2 rounded-full bg-[#168568]" />
+                  <span className="font-bold text-sm text-[#172033]">{sess.agent_name}</span>
+                  <Badge variant="accent">{sess.agent_role}</Badge>
+                  <Badge variant="warning">Benchmark Fixture</Badge>
                 </div>
-                <div className="flex items-center gap-3 text-[11px] font-mono text-[#64748B]">
+                <div className="flex items-center gap-3 text-xs font-mono text-[#667085]">
                   <span>Session: {sess.id}</span>
                   <span>Flow: {sess.gitlab_flow_name || "standard"}</span>
                 </div>
               </div>
 
               <div>
-                <span className="text-xs font-semibold text-[#64748B] block mb-0.5">Objective:</span>
-                <p className="text-xs text-[#1E293B] font-medium">{sess.goal}</p>
+                <span className="text-xs font-semibold text-[#667085] block mb-0.5">Objective:</span>
+                <p className="text-xs text-[#172033] font-medium leading-relaxed">{sess.goal}</p>
               </div>
 
               {sess.summary && (
-                <div className="p-3 rounded bg-[#FAF8F5] border border-[#ECE6DA] text-xs text-[#475569]">
-                  <span className="font-semibold text-[#0F172A] block mb-0.5">Execution Summary:</span>
+                <div className="p-3.5 rounded-xl bg-[#FAF9F6] border border-[#DCE2EB]/80 text-xs text-[#667085] leading-relaxed">
+                  <span className="font-semibold text-[#172033] block mb-0.5">Execution Summary:</span>
                   {sess.summary}
                 </div>
               )}
 
               {sess.tools_invoked && sess.tools_invoked.length > 0 && (
                 <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                  <span className="text-[10px] font-mono text-[#64748B] mr-1">Tools Invoked:</span>
+                  <span className="text-[10px] font-mono text-[#667085] mr-1">Tools Invoked:</span>
                   {sess.tools_invoked.map((tool) => (
                     <span
                       key={tool}
-                      className="px-2 py-0.5 rounded bg-white border border-[#ECE6DA] text-[10px] font-mono text-[#334155]"
+                      className="px-2 py-0.5 rounded-md bg-[#FAF9F6] border border-[#DCE2EB] text-[10px] font-mono text-[#172033]"
                     >
                       {tool}
                     </span>

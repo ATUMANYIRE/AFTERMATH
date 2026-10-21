@@ -23,6 +23,9 @@ import {
   RotateCcw,
   Eye,
   Info,
+  RefreshCw,
+  GitCommit,
+  Wrench,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -34,15 +37,20 @@ import {
   CausalPathTraceItem,
 } from "@/lib/api";
 import { CausalFlowGraph } from "@/components/CausalFlowGraph";
+import { StatCard } from "@/components/ui/stat-card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { SegmentedTabs } from "@/components/ui/tabs";
 
 export default function InvestigationPage() {
-  const [selectedRelease, setSelectedRelease] = useState("rel-2026-001");
+  const [selectedRelease] = useState("rel-2026-001");
   const [selectedVariant, setSelectedVariant] = useState<"vulnerable" | "repaired" | "both">("vulnerable");
   const [selectedNode, setSelectedNode] = useState<CausalNodeItem | null>(null);
   const [activePathTrace, setActivePathTrace] = useState<CausalPathTraceItem | null>(null);
   const [isTracing, setIsTracing] = useState(false);
 
-  // 1. Fetch Causal Graph for the active release & variant
+  // 1. Fetch Causal Graph for active release & variant
   const {
     data: causalGraph,
     isLoading: graphLoading,
@@ -91,7 +99,6 @@ export default function InvestigationPage() {
         10
       );
       setActivePathTrace(trace);
-      // Automatically select the consequence node for inspection
       if (causalGraph?.nodes) {
         const consNode = causalGraph.nodes.find((n) => n.id === "cnode-cons-double-debit");
         if (consNode) setSelectedNode(consNode);
@@ -110,31 +117,32 @@ export default function InvestigationPage() {
   if (graphLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-28 bg-white border border-[#ECE6DA] rounded-lg"></div>
-        <div className="h-24 bg-white border border-[#ECE6DA] rounded-lg"></div>
-        <div className="h-[550px] bg-white border border-[#ECE6DA] rounded-lg"></div>
+        <div className="h-28 bg-white rounded-2xl border border-[#DCE2EB]" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-44 bg-white rounded-2xl border border-[#DCE2EB]" />
+          ))}
+        </div>
+        <div className="h-[580px] bg-white rounded-2xl border border-[#DCE2EB]" />
       </div>
     );
   }
 
   if (graphError || !causalGraph) {
     return (
-      <div className="bg-white border border-[#FECDD3] rounded-lg p-8 text-center max-w-xl mx-auto my-12">
-        <div className="w-12 h-12 rounded-full bg-[#FFF1F2] text-[#BE123C] flex items-center justify-center mx-auto mb-3">
+      <div className="bg-white border border-rose-200 rounded-2xl p-10 text-center max-w-xl mx-auto my-16 shadow-card">
+        <div className="w-12 h-12 rounded-full bg-rose-50 text-[#C74747] flex items-center justify-center mx-auto mb-4">
           <ShieldAlert className="w-6 h-6" />
         </div>
-        <h3 className="text-base font-semibold text-[#0F172A] mb-1">
+        <h3 className="text-lg font-semibold text-[#172033] mb-1">
           Causal Graph Unavailable
         </h3>
-        <p className="text-sm text-[#64748B] mb-4">
+        <p className="text-sm text-[#667085] mb-6">
           Failed to fetch directed causal graph for {selectedRelease}.
         </p>
-        <button
-          onClick={() => refetchGraph()}
-          className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded bg-[#0F172A] text-white"
-        >
-          Retry
-        </button>
+        <Button onClick={() => refetchGraph()} variant="primary" icon={<RefreshCw className="w-4 h-4" />}>
+          Retry Query
+        </Button>
       </div>
     );
   }
@@ -147,182 +155,128 @@ export default function InvestigationPage() {
     : "$1,500.00";
 
   return (
-    <div className="space-y-6">
-      {/* 1. Header & Variant Controller */}
-      <div className="bg-white border border-[#ECE6DA] rounded-lg p-6 shadow-2xs">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-[#64748B] mb-1">
-              <span>INVESTIGATION WORKSPACE</span>
-              <span>&bull;</span>
-              <span className="text-[#1D4ED8] font-medium">
-                CAUSAL GRAPH &amp; BLAST RADIUS INTELLIGENCE
-              </span>
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-[#0F172A] flex items-center gap-2">
-              <Compass className="w-6 h-6 text-[#1D4ED8]" />
-              Consequence Investigation &amp; Blast Radius
-            </h1>
-            <p className="text-sm text-[#475569] mt-0.5">
-              Persistent directed dependency topology classifying empirical evidence, invariant violations, and counterfactual remediations.
-            </p>
+    <div className="space-y-8">
+      {/* =========================================================================
+          1. HEADER & INTERACTIVE TRACE CONTROLS
+          ========================================================================= */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EFF4FE] text-[#3558D4] border border-[#BFD5FB]/60">
+              <Compass className="w-3 h-3 text-[#3558D4]" />
+              Causal Graph &amp; Blast Radius
+            </span>
+            <span className="text-xs text-[#667085]">|</span>
+            <span className="text-xs text-[#667085]">Empirical Dependency Intelligence</span>
           </div>
-
-          <div className="flex flex-wrap items-center gap-2.5">
-            {/* Signature Interaction Button */}
-            <button
-              onClick={handleTraceSignaturePath}
-              disabled={isTracing}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-[#BE123C] hover:bg-[#9F1239] text-white rounded transition-colors shadow-2xs cursor-pointer"
-            >
-              <Zap className="w-3.5 h-3.5 text-white" />
-              <span>{isTracing ? "Tracing Path..." : "Trace Duplicate Debit Causal Path"}</span>
-            </button>
-
-            {/* Time Machine Deep Link */}
-            <Link
-              href="/time-machine"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-[#1D4ED8] hover:bg-[#1E40AF] text-white rounded transition-colors shadow-2xs"
-            >
-              <Clock className="w-3.5 h-3.5" />
-              <span>Launch Release Time Machine</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* Counterfactual Variant Switcher Tabs */}
-        <div className="mt-5 pt-4 border-t border-[#ECE6DA] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-[#0F172A]">
-            <span className="text-[#64748B]">Active Release Variant:</span>
-            <div className="inline-flex rounded-lg border border-[#ECE6DA] p-0.5 bg-[#FAF8F5]">
-              <button
-                onClick={() => {
-                  setSelectedVariant("vulnerable");
-                  handleClearTrace();
-                }}
-                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
-                  selectedVariant === "vulnerable"
-                    ? "bg-[#BE123C] text-white shadow-2xs"
-                    : "text-[#64748B] hover:text-[#0F172A]"
-                }`}
-              >
-                Vulnerable Release Baseline
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedVariant("repaired");
-                  handleClearTrace();
-                }}
-                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
-                  selectedVariant === "repaired"
-                    ? "bg-[#047857] text-white shadow-2xs"
-                    : "text-[#64748B] hover:text-[#0F172A]"
-                }`}
-              >
-                Repaired Release (Engine Verified)
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedVariant("both");
-                  handleClearTrace();
-                }}
-                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
-                  selectedVariant === "both"
-                    ? "bg-[#1D4ED8] text-white shadow-2xs"
-                    : "text-[#64748B] hover:text-[#0F172A]"
-                }`}
-              >
-                Complete Causal Diff
-              </button>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 text-xs font-mono text-[#64748B]">
-            <span>Release: <strong className="text-[#0F172A]">{selectedRelease}</strong></span>
-            <span>&bull;</span>
-            <span>Topology: {causalGraph.total_nodes} nodes, {causalGraph.total_edges} edges</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Blast Radius & Impact Intelligence Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Exposure Card */}
-        <div className="bg-white border border-[#ECE6DA] rounded-lg p-4 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-xs font-mono text-[#64748B]">
-            <span>SYNTHETIC FINANCIAL EXPOSURE</span>
-            <DollarSign className="w-4 h-4 text-[#BE123C]" />
-          </div>
-          <div className="text-2xl font-bold font-mono text-[#0F172A]">
-            {exposureDisplay}
-          </div>
-          <p className="text-[11px] text-[#64748B]">
-            {isRepairedActive
-              ? "100% neutralized in repaired release"
-              : "20 duplicate charges across retry windows"}
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#172033]">
+            Causal Graph &amp; Blast Radius
+          </h1>
+          <p className="text-sm text-[#667085] mt-1 max-w-2xl leading-relaxed">
+            Persistent directed graph connecting source code defects, concurrency windows, database pool starvation, and customer financial risk.
           </p>
         </div>
 
-        {/* Direct Affected Services */}
-        <div className="bg-white border border-[#ECE6DA] rounded-lg p-4 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-xs font-mono text-[#64748B]">
-            <span>DIRECTLY AFFECTED SERVICES</span>
-            <Server className="w-4 h-4 text-[#1D4ED8]" />
-          </div>
-          <div className="text-2xl font-bold font-mono text-[#0F172A]">
-            {blastRadius ? blastRadius.directly_affected_services.length : 2} Services
-          </div>
-          <p className="text-[11px] text-[#64748B] truncate">
-            Checkout Service &bull; Synthetic Payment Gateway
-          </p>
-        </div>
-
-        {/* Downstream Cascades */}
-        <div className="bg-white border border-[#ECE6DA] rounded-lg p-4 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-xs font-mono text-[#64748B]">
-            <span>DOWNSTREAM PROPAGATION</span>
-            <Database className="w-4 h-4 text-[#B45309]" />
-          </div>
-          <div className="text-2xl font-bold font-mono text-[#0F172A]">
-            {blastRadius ? blastRadius.downstream_affected_services.length : 2} Components
-          </div>
-          <p className="text-[11px] text-[#64748B] truncate">
-            PostgreSQL Ledger &bull; Customer Dispute Rail
-          </p>
-        </div>
-
-        {/* Invariant Status */}
-        <div className="bg-white border border-[#ECE6DA] rounded-lg p-4 shadow-2xs space-y-1">
-          <div className="flex items-center justify-between text-xs font-mono text-[#64748B]">
-            <span>SAFETY INVARIANT (INV-PAY-001)</span>
-            <Scale className="w-4 h-4 text-[#047857]" />
-          </div>
-          <div
-            className={`text-lg font-bold font-mono flex items-center gap-1.5 ${
-              isRepairedActive ? "text-[#047857]" : "text-[#BE123C]"
-            }`}
+        {/* Action Controls */}
+        <div className="flex items-center gap-3 shrink-0">
+          {activePathTrace && (
+            <Button onClick={handleClearTrace} variant="outline" size="md" icon={<RotateCcw className="w-3.5 h-3.5" />}>
+              Reset Trace
+            </Button>
+          )}
+          <Button
+            onClick={handleTraceSignaturePath}
+            disabled={isTracing}
+            variant="primary"
+            size="md"
+            icon={<Zap className="w-4 h-4 fill-current" />}
           >
-            {isRepairedActive ? "PRESERVED (100%)" : "VIOLATED (Critical)"}
-          </div>
-          <p className="text-[11px] text-[#64748B] truncate">
-            One logical purchase must not produce multiple charges
-          </p>
+            {isTracing ? "Tracing Causal Path..." : "Trace Duplicate Debit Causal Path"}
+          </Button>
         </div>
       </div>
 
-      {/* 3. Signature Causal Path Stepper (When active) */}
+      {/* =========================================================================
+          2. METRIC STAT CARDS
+          ========================================================================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <StatCard
+          tag="Topological Nodes"
+          tagVariant="accent"
+          title="Total Causal Nodes"
+          value={causalGraph.nodes.length}
+          delta={{
+            value: "11 Empirical Code & System Entities",
+            isPositive: true,
+          }}
+          subStats={[
+            { label: "Code Entities", value: "3 AST Elements" },
+            { label: "Runtime Entities", value: "8 System Events" },
+          ]}
+        />
+
+        <StatCard
+          tag="Directed Edges"
+          tagVariant="default"
+          title="Dependency Edges"
+          value={causalGraph.edges.length}
+          delta={{
+            value: "8 Proven Causal Pathways",
+            isPositive: true,
+          }}
+          subStats={[
+            { label: "Experimentally Proven", value: "5 Edges" },
+            { label: "Inferred Effects", value: "3 Edges" },
+          ]}
+        />
+
+        <StatCard
+          tag="Quantified Risk"
+          tagVariant={isRepairedActive ? "success" : "error"}
+          title="Financial Blast Radius"
+          value={exposureDisplay}
+          delta={{
+            value: isRepairedActive ? "Completely Mitigated" : "Active Customer Risk",
+            isRisk: !isRepairedActive,
+            isPositive: isRepairedActive,
+          }}
+          subStats={[
+            { label: "Affected Orders", value: isRepairedActive ? "0 Orders" : "12 Orders" },
+            { label: "Max Single Charge", value: "$120.00" },
+          ]}
+        />
+
+        <StatCard
+          tag="Cascading Failure"
+          tagVariant="warning"
+          title="Connection Starvation"
+          value="1,600ms"
+          delta={{
+            value: "PostgreSQL Pool Depleted (342 Waiters)",
+            isRisk: true,
+          }}
+          subStats={[
+            { label: "Max Pool Size", value: "100" },
+            { label: "Cascading Services", value: "3 Degraded" },
+          ]}
+        />
+      </div>
+
+      {/* =========================================================================
+          3. SIGNATURE CAUSAL PATH STEPPER (When trace active)
+          ========================================================================= */}
       {activePathTrace && activePathTrace.path_found && (
-        <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-lg p-4 shadow-2xs space-y-3">
+        <div className="bg-rose-50/70 border border-rose-200 rounded-2xl p-5 shadow-card space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#BE123C] animate-ping"></span>
-              <h3 className="text-xs font-bold font-mono uppercase text-[#9F1239]">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#C74747] animate-ping" />
+              <h3 className="text-xs font-bold font-mono uppercase text-[#C74747]">
                 Active Causal Path: Code Change &rarr; Duplicate Debit Consequence ({activePathTrace.path_length} Steps)
               </h3>
             </div>
             <button
               onClick={handleClearTrace}
-              className="text-[11px] font-mono text-[#BE123C] hover:underline inline-flex items-center gap-1 cursor-pointer"
+              className="text-[11px] font-mono text-[#C74747] hover:underline inline-flex items-center gap-1 cursor-pointer"
             >
               <RotateCcw className="w-3 h-3" />
               Reset Path Highlight
@@ -334,205 +288,243 @@ export default function InvestigationPage() {
               <React.Fragment key={step.step_index}>
                 <div
                   onClick={() => setSelectedNode(step.node)}
-                  className={`px-2.5 py-1.5 rounded border text-xs font-mono cursor-pointer transition-all ${
+                  className={`px-2.5 py-1.5 rounded-xl border text-xs font-mono cursor-pointer transition-all ${
                     selectedNode?.id === step.node.id
-                      ? "bg-[#9F1239] text-white border-[#9F1239]"
-                      : "bg-white border-[#FECDD3] text-[#9F1239] hover:bg-[#FFF1F2]"
+                      ? "bg-[#C74747] text-white border-[#C74747]"
+                      : "bg-white border-rose-200 text-[#C74747] hover:bg-rose-50"
                   }`}
                 >
                   <span className="font-bold mr-1">[{idx + 1}]</span>
                   <span>{step.node.label}</span>
                 </div>
                 {idx < activePathTrace.steps.length - 1 && (
-                  <ArrowRight className="w-4 h-4 text-[#BE123C]" />
+                  <ArrowRight className="w-3.5 h-3.5 text-rose-300" />
                 )}
               </React.Fragment>
             ))}
           </div>
 
-          <p className="text-xs text-[#78350F] bg-white/70 p-2 rounded border border-[#FECDD3]/50">
-            <strong>Causal Explanation:</strong> Git commit <code>a8f9c21b</code> removed thread synchronization. Injected client retry triggers parallel execution inside the synthetic payment gateway, debited 20 customer orders twice, strictly violating invariant <code>INV-PAY-001</code>.
+          <p className="text-xs text-[#172033] bg-white p-3 rounded-xl border border-rose-200/60 leading-relaxed">
+            <strong className="text-[#C74747]">Causal Explanation:</strong> Git commit <code>a8f9c21b</code> removed thread synchronization. Injected client retry triggers parallel execution inside the synthetic payment gateway, debited customer orders twice, strictly violating invariant <code>INV-PAY-001</code>.
           </p>
         </div>
       )}
 
-      {/* 4. Main Workspace Canvas + Evidence Inspector Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: React Flow Directed Graph (Takes 2 Columns) */}
-        <div className="lg:col-span-2 space-y-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-bold text-[#0F172A] flex items-center gap-2">
-                <Layers className="w-4 h-4 text-[#1D4ED8]" />
-                Interactive Causal Dependency Graph
-              </h2>
-              <p className="text-xs text-[#64748B]">
-                Pan, zoom, and select nodes to inspect empirical evidence, provenance, and failure paths.
-              </p>
+      {/* =========================================================================
+          4. MAIN CANVAS & CONTEXTUAL EVIDENCE INSPECTOR (Split Layout)
+          ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Graph Canvas Column (8 cols) */}
+        <div className="lg:col-span-8 space-y-4">
+          <div className="bg-white rounded-2xl border border-[#DCE2EB] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-card">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-[#172033]">Release Variant:</span>
+              <SegmentedTabs
+                size="sm"
+                options={[
+                  { id: "vulnerable", label: "Vulnerable (Unpatched)" },
+                  { id: "repaired", label: "Repaired (Duo)" },
+                  { id: "both", label: "Both (Superposition)" },
+                ]}
+                activeId={selectedVariant}
+                onChange={(id) => setSelectedVariant(id as any)}
+              />
             </div>
-            <div className="flex items-center gap-2 text-xs font-mono text-[#64748B]">
-              <span className="px-2 py-0.5 rounded bg-white border border-[#ECE6DA]">
-                {causalGraph.experimentally_supported_edges} Verified Edges
-              </span>
+
+            <div className="text-xs text-[#667085] flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#168568]" />
+              <span>Click any node to inspect evidence</span>
             </div>
           </div>
 
-          {/* Canvas Component */}
+          {/* Interactive Graph Canvas */}
           <CausalFlowGraph
             nodes={causalGraph.nodes}
             edges={causalGraph.edges}
-            selectedNodeId={selectedNode ? selectedNode.id : null}
+            selectedNodeId={selectedNode?.id || null}
             highlightedPathNodeIds={highlightedNodeIds}
             highlightedPathEdgeIds={highlightedEdgeIds}
             onSelectNode={(node) => setSelectedNode(node)}
           />
         </div>
 
-        {/* Right: Evidence Inspector Panel (Takes 1 Column) */}
-        <div className="bg-white border border-[#ECE6DA] rounded-lg p-5 shadow-2xs space-y-4">
-          <div className="flex items-center justify-between border-b border-[#ECE6DA] pb-3">
-            <h3 className="text-sm font-bold text-[#0F172A] flex items-center gap-2">
-              <FileText className="w-4 h-4 text-[#1D4ED8]" />
-              Evidence &amp; Provenance Inspector
-            </h3>
-            {selectedNode && (
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#FAF8F5] border border-[#ECE6DA] text-[#64748B]">
-                {selectedNode.id}
-              </span>
-            )}
-          </div>
-
-          {selectedNode ? (
-            <div className="space-y-4 text-xs font-sans">
-              <div>
-                <span className="text-[10px] font-mono uppercase text-[#64748B] block mb-1">
-                  Selected Node
-                </span>
-                <h4 className="text-sm font-bold text-[#0F172A]">{selectedNode.label}</h4>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-[#0F172A] text-white">
-                    {selectedNode.node_type.replace(/_/g, " ")}
+        {/* Evidence & Node Inspector Column (4 cols) */}
+        <div className="lg:col-span-4 space-y-4">
+          <Card className="h-full flex flex-col justify-between">
+            <div>
+              <CardHeader className="border-b border-[#DCE2EB]/80 pb-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono font-bold text-[#667085] uppercase tracking-wider">
+                    Contextual Inspector
                   </span>
-                  <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
-                      selectedNode.severity === "critical"
-                        ? "bg-[#BE123C] text-white"
-                        : selectedNode.severity === "warning"
-                        ? "bg-[#B45309] text-white"
-                        : selectedNode.severity === "verified" || selectedNode.severity === "mitigated"
-                        ? "bg-[#047857] text-white"
-                        : "bg-[#64748B] text-white"
-                    }`}
-                  >
-                    {selectedNode.severity}
-                  </span>
-                </div>
-              </div>
-
-              {selectedNode.description && (
-                <div>
-                  <span className="text-[10px] font-mono uppercase text-[#64748B] block mb-1">
-                    Description &amp; Diagnosis
-                  </span>
-                  <p className="text-xs text-[#334155] leading-relaxed bg-[#FAF8F5] p-2.5 rounded border border-[#ECE6DA]">
-                    {selectedNode.description}
-                  </p>
-                </div>
-              )}
-
-              {/* Provenance Box */}
-              <div>
-                <span className="text-[10px] font-mono uppercase text-[#64748B] block mb-1">
-                  Epistemic Provenance
-                </span>
-                <div className="p-2.5 rounded border border-[#ECE6DA] bg-white font-mono text-[11px] space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-[#64748B]">Provenance Type:</span>
-                    <span className="font-semibold text-[#0F172A]">{selectedNode.provenance_type}</span>
-                  </div>
-                  {selectedNode.provenance_id && (
-                    <div className="flex justify-between">
-                      <span className="text-[#64748B]">Identifier:</span>
-                      <span className="font-semibold text-[#1D4ED8]">{selectedNode.provenance_id}</span>
-                    </div>
+                  {selectedNode && (
+                    <Badge variant={selectedNode.severity === "critical" ? "error" : "accent"}>
+                      {selectedNode.severity}
+                    </Badge>
                   )}
-                  <div className="flex justify-between">
-                    <span className="text-[#64748B]">Recorded At:</span>
-                    <span>{new Date(selectedNode.created_at).toLocaleTimeString()}</span>
-                  </div>
                 </div>
-              </div>
+                <CardTitle className="text-base mt-1">
+                  {selectedNode ? selectedNode.label : "Select a Node to Inspect"}
+                </CardTitle>
+                <CardDescription>
+                  {selectedNode
+                    ? `Entity type: ${selectedNode.node_type.replace(/_/g, " ")}`
+                    : "Click any graph node to inspect empirical citations and provenance"}
+                </CardDescription>
+              </CardHeader>
 
-              {/* Metadata Key-Value pairs */}
-              {selectedNode.metadata_json && Object.keys(selectedNode.metadata_json).length > 0 && (
-                <div>
-                  <span className="text-[10px] font-mono uppercase text-[#64748B] block mb-1">
-                    Technical Attributes
-                  </span>
-                  <div className="p-2.5 rounded border border-[#ECE6DA] bg-[#FAF8F5] font-mono text-[11px] space-y-1">
-                    {Object.entries(selectedNode.metadata_json)
-                      .filter(([k]) => k !== "x" && k !== "y")
-                      .map(([k, v]) => (
-                        <div key={k} className="flex justify-between">
-                          <span className="text-[#64748B]">{k}:</span>
-                          <span className="font-bold text-[#0F172A]">{String(v)}</span>
-                        </div>
-                      ))}
+              <CardContent className="pt-4 space-y-4 text-xs">
+                {selectedNode ? (
+                  <>
+                    <div>
+                      <span className="text-[#667085] font-semibold block mb-1">Description:</span>
+                      <p className="text-[#172033] leading-relaxed bg-[#FAF9F6] p-3 rounded-xl border border-[#DCE2EB]/70">
+                        {selectedNode.description || "No extended description provided."}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="p-2.5 rounded-xl bg-[#FAF9F6] border border-[#DCE2EB]/70">
+                        <span className="text-[#667085] block text-[10px] uppercase font-bold">Provenance Type</span>
+                        <span className="font-semibold text-[#172033] block mt-0.5">
+                          {selectedNode.provenance_type.replace(/_/g, " ")}
+                        </span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-[#FAF9F6] border border-[#DCE2EB]/70">
+                        <span className="text-[#667085] block text-[10px] uppercase font-bold">Provenance Ref</span>
+                        <span className="font-mono font-semibold text-[#172033] block mt-0.5 truncate">
+                          {selectedNode.provenance_id || "N/A"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {Boolean(selectedNode.metadata_json?.raw_log_excerpt) && (
+                      <div>
+                        <span className="text-[#667085] font-semibold block mb-1">Empirical Log Evidence:</span>
+                        <pre className="p-3 bg-slate-900 text-slate-100 rounded-xl font-mono text-[10px] overflow-x-auto leading-relaxed">
+                          {String(selectedNode.metadata_json.raw_log_excerpt)}
+                        </pre>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="py-12 text-center text-[#667085] space-y-3">
+                    <Compass className="w-10 h-10 text-[#3558D4]/40 mx-auto" />
+                    <p className="max-w-xs mx-auto">
+                      Click on any node in the canvas or use the <strong className="text-[#172033]">Trace Duplicate Debit Causal Path</strong> button to step through the causal sequence.
+                    </p>
                   </div>
-                </div>
-              )}
+                )}
+              </CardContent>
+            </div>
 
-              {/* Deep Link to Time Machine */}
-              <div className="pt-2 border-t border-[#ECE6DA]">
-                <Link
-                  href="/time-machine"
-                  className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded bg-[#0F172A] hover:bg-[#1E293B] text-white transition-colors"
-                >
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>Inspect Consequence in Time Machine</span>
+            {selectedNode && (
+              <div className="p-4 border-t border-[#DCE2EB] bg-[#FAF9F6] rounded-b-2xl flex flex-col gap-2">
+                <Link href="/remediation" className="w-full block">
+                  <Button variant="primary" size="sm" icon={<Wrench className="w-3.5 h-3.5" />} className="w-full justify-center">
+                    Proceed to Remediation Studio
+                  </Button>
+                </Link>
+                <Link href="/time-machine" className="w-full block">
+                  <Button variant="outline" size="sm" icon={<Clock className="w-3.5 h-3.5" />} className="w-full justify-center text-[#667085] hover:text-[#172033]">
+                    Inspect Consequence in Time Machine
+                  </Button>
                 </Link>
               </div>
-            </div>
-          ) : (
-            <div className="text-center py-12 text-[#64748B] space-y-2">
-              <Info className="w-8 h-8 text-[#94A3B8] mx-auto" />
-              <p className="text-xs">
-                Click any service, failure condition, invariant, or consequence node in the topology canvas to inspect verified empirical evidence.
-              </p>
-            </div>
-          )}
+            )}
+          </Card>
         </div>
       </div>
 
-      {/* 5. Mobile Responsive Linear Fallback */}
-      <div className="block lg:hidden bg-white border border-[#ECE6DA] rounded-lg p-5 shadow-2xs space-y-4">
-        <h3 className="text-sm font-bold text-[#0F172A] flex items-center gap-2">
-          <Layers className="w-4 h-4 text-[#1D4ED8]" />
-          Sequential Causal Path (Mobile Linear View)
-        </h3>
-        <div className="space-y-2.5">
-          {causalGraph.nodes.map((node, idx) => (
-            <div
-              key={node.id}
-              onClick={() => setSelectedNode(node)}
-              className="p-3 rounded-lg border border-[#ECE6DA] bg-[#FAF8F5] text-xs space-y-1 cursor-pointer hover:border-[#1D4ED8]"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] uppercase text-[#64748B]">
-                  Step {idx + 1} &bull; {node.node_type}
-                </span>
-                <span className="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded uppercase bg-[#0F172A] text-white">
-                  {node.severity}
-                </span>
-              </div>
-              <h5 className="font-bold text-[#0F172A]">{node.label}</h5>
-              {node.description && (
-                <p className="text-[11px] text-[#475569]">{node.description}</p>
-              )}
+      {/* =========================================================================
+          4. QUANTIFIED BLAST RADIUS BREAKDOWN TABLE
+          ========================================================================= */}
+      {blastRadius && (
+        <div className="bg-white rounded-2xl border border-[#DCE2EB] overflow-hidden shadow-card">
+          <div className="p-6 border-b border-[#DCE2EB] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="text-base font-bold text-[#172033]">
+                Empirical Blast Radius Breakdown
+              </h3>
+              <p className="text-xs text-[#667085] mt-0.5">
+                Downstream services impacted by the concurrency defect in services/payment_worker/processor.py
+              </p>
             </div>
-          ))}
+            <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-rose-50 text-[#C74747] font-semibold border border-rose-200">
+              Total Risk: ${blastRadius.financial_exposure_usd.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            </span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-[#FAF9F6] text-[#667085] font-medium border-b border-[#DCE2EB]">
+                <tr>
+                  <th className="px-6 py-3">Impacted Service</th>
+                  <th className="px-5 py-3">Cascading Failure Mode</th>
+                  <th className="px-5 py-3">Onset Latency</th>
+                  <th className="px-5 py-3">Empirical Evidence</th>
+                  <th className="px-6 py-3">Remediated State</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#DCE2EB]/60">
+                <tr className="hover:bg-[#FAF9F6]/50">
+                  <td className="px-6 py-3.5 font-bold font-mono text-[#172033]">
+                    payment-service
+                  </td>
+                  <td className="px-5 py-3.5 text-[#C74747] font-semibold">
+                    INV-PAY-001 Double Debits (4 charges)
+                  </td>
+                  <td className="px-5 py-3.5 font-mono text-[#667085]">
+                    +40ms race gap
+                  </td>
+                  <td className="px-5 py-3.5 font-mono text-[#667085]">
+                    exp-vuln-001 (5 concurrent checkouts)
+                  </td>
+                  <td className="px-6 py-3.5 text-[#168568] font-bold">
+                    0 Duplicate Debits (Deduped)
+                  </td>
+                </tr>
+
+                <tr className="hover:bg-[#FAF9F6]/50">
+                  <td className="px-6 py-3.5 font-bold font-mono text-[#172033]">
+                    ledger-db (PostgreSQL 16)
+                  </td>
+                  <td className="px-5 py-3.5 text-[#D78A43] font-semibold">
+                    Connection Pool Starvation (342 Waiters)
+                  </td>
+                  <td className="px-5 py-3.5 font-mono text-[#667085]">
+                    +1,600ms onset
+                  </td>
+                  <td className="px-5 py-3.5 font-mono text-[#667085]">
+                    evi-002 (Pool max size 100 exhausted)
+                  </td>
+                  <td className="px-6 py-3.5 text-[#168568] font-bold">
+                    Pool Nominal (0 Waiters)
+                  </td>
+                </tr>
+
+                <tr className="hover:bg-[#FAF9F6]/50">
+                  <td className="px-6 py-3.5 font-bold font-mono text-[#172033]">
+                    checkout-worker
+                  </td>
+                  <td className="px-5 py-3.5 text-[#D78A43] font-semibold">
+                    Retry Storm Cascade
+                  </td>
+                  <td className="px-5 py-3.5 font-mono text-[#667085]">
+                    +2,100ms onset
+                  </td>
+                  <td className="px-5 py-3.5 font-mono text-[#667085]">
+                    Unbounded Exponential Retries
+                  </td>
+                  <td className="px-6 py-3.5 text-[#168568] font-bold">
+                    Single Execution (SLA 68ms)
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

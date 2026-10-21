@@ -8,8 +8,10 @@ if (!fs.existsSync(OUT_DIR)) {
 }
 
 const viewports = [
-  { label: "desktop", width: 1440, height: 900 },
-  { label: "mobile", width: 390, height: 844 },
+  { label: "desktop_1440", width: 1440, height: 900 },
+  { label: "desktop_1366", width: 1366, height: 768 },
+  { label: "tablet_768", width: 768, height: 1024 },
+  { label: "mobile_390", width: 390, height: 844 },
 ];
 
 async function capture() {
@@ -37,9 +39,9 @@ async function capture() {
     await page.goto("http://localhost:3000/time-machine", { waitUntil: "networkidle", timeout: 20000 });
     await page.waitForTimeout(1000);
 
-    // If desktop, trigger "Execute Experiment Pair" to show live consequence execution in action!
-    if (vp.label === "desktop") {
-      console.log("Triggering Execute Experiment Pair on desktop...");
+    // If desktop_1440, trigger "Execute Experiment Pair" to show live consequence execution in action!
+    if (vp.label === "desktop_1440") {
+      console.log("Triggering Execute Experiment Pair on desktop_1440...");
       const executeBtn = page.locator("button:has-text('Execute Experiment Pair')");
       if (await executeBtn.isVisible()) {
         await executeBtn.click();
@@ -69,9 +71,9 @@ async function capture() {
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(OUT_DIR, `investigation_${vp.label}.png`), fullPage: true });
 
-    // If desktop, trigger Causal Path Trace and capture the highlighted path view!
-    if (vp.label === "desktop") {
-      console.log("Triggering Trace Duplicate Debit Causal Path on desktop...");
+    // If desktop_1440, trigger Causal Path Trace and capture the highlighted path view!
+    if (vp.label === "desktop_1440") {
+      console.log("Triggering Trace Duplicate Debit Causal Path on desktop_1440...");
       const traceBtn = page.locator("button:has-text('Trace Duplicate Debit Causal Path')");
       if (await traceBtn.isVisible()) {
         await traceBtn.click();
@@ -86,8 +88,8 @@ async function capture() {
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(OUT_DIR, `remediation_${vp.label}.png`), fullPage: true });
 
-    // If desktop, capture Sandbox Execution Proof tab as well
-    if (vp.label === "desktop") {
+    // If desktop_1440, capture Sandbox Execution Proof tab as well
+    if (vp.label === "desktop_1440") {
       try {
         const sandboxTab = page.locator("button:has-text('Sandbox Execution Proof')");
         if (await sandboxTab.isVisible()) {
@@ -112,7 +114,7 @@ async function capture() {
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(OUT_DIR, `release_superposition_${vp.label}.png`), fullPage: true });
 
-    if (vp.label === "desktop") {
+    if (vp.label === "desktop_1440") {
       try {
         const gatesTab = page.locator("button:has-text('DevSecOps Policy Gates')");
         if (await gatesTab.isVisible()) {

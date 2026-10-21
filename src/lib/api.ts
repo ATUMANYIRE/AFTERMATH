@@ -98,6 +98,83 @@ export interface ScenarioConfig {
   seed: number;
 }
 
+export interface RemediationWorkflowItem {
+  id: string;
+  release_id: string;
+  triggering_experiment_id?: string | null;
+  violated_invariant: string;
+  causal_node_id?: string | null;
+  source_commit: string;
+  target_file_path: string;
+  patch_diff?: string | null;
+  patch_hash?: string | null;
+  changed_files: string[];
+  status:
+    | "DETECTED"
+    | "INVESTIGATING"
+    | "PATCH_PROPOSED"
+    | "VALIDATING"
+    | "AWAITING_APPROVAL"
+    | "APPROVED"
+    | "REJECTED"
+    | "COMPLETED"
+    | "FAILED"
+    | "CANCELLED"
+    | "BLOCKED";
+  agent_provider: string;
+  agent_model?: string | null;
+  tool_execution_records: Array<{
+    step: number;
+    tool: string;
+    action: string;
+    details?: string;
+    timestamp: string;
+    [key: string]: unknown;
+  }>;
+  validation_results: {
+    verified?: boolean;
+    tested_at?: string;
+    pre_patch_run?: {
+      exit_code: number;
+      passed: number;
+      failed: number;
+      duration_seconds: number;
+      stdout: string;
+      stderr: string;
+      invariant_violated?: string;
+    };
+    post_patch_run?: {
+      exit_code: number;
+      passed: number;
+      failed: number;
+      duration_seconds: number;
+      stdout: string;
+      stderr: string;
+      invariant_satisfied?: string;
+    };
+    sandbox_worktree?: {
+      isolation_mode: string;
+      clean_teardown: boolean;
+    };
+    [key: string]: unknown;
+  };
+  approval_status: "PENDING" | "APPROVED" | "REJECTED";
+  approval_decision?: {
+    status: string;
+    approver_name: string;
+    approver_email: string;
+    note?: string;
+    reason?: string;
+    decided_at: string;
+  } | null;
+  remediation_branch?: string | null;
+  gitlab_mr_url?: string | null;
+  gitlab_mr_status: string;
+  created_at: string;
+  updated_at: string;
+  completed_at?: string | null;
+}
+
 export interface ExperimentItem {
   id: string;
   release_id: string;
@@ -431,4 +508,51 @@ export const api = {
     fetchApi<CausalPathTraceItem>(
       `/api/v1/investigation/${releaseId}/trace-path?source_node_id=${sourceNodeId}&target_node_id=${targetNodeId}&max_depth=${maxDepth}`
     ),
+
+  // Milestone 4 Autonomous Remediation & Fix Verification APIs
+  getRemediationWorkflows: (releaseId?: string) =>
+    fetchApi<RemediationWorkflowItem[]>(
+      `/api/v1/remediations/workflows${releaseId ? `?release_id=${releaseId}` : ""}`
+    ),
+  getRemediationWorkflow: (workflowId: string) =>
+    fetchApi<RemediationWorkflowItem>(`/api/v1/remediations/workflows/${workflowId}`),
+  triggerRemediation: (req: {
+    release_id: string;
+    triggering_experiment_id?: string;
+    violated_invariant?: string;
+    causal_node_id?: string;
+    target_file_path?: string;
+  }) =>
+    fetchApi<RemediationWorkflowItem>("/api/v1/remediations/trigger", {
+      method: "POST",
+      body: JSON.stringify(req),
+    }),
+  validateRemediation: (workflowId: string) =>
+    fetchApi<RemediationWorkflowItem>(`/api/v1/remediations/workflows/${workflowId}/validate`, {
+      method: "POST",
+    }),
+  approveRemediation: (
+    workflowId: string,
+    req: { approver_name: string; approver_email: string; note?: string }
+  ) =>
+    fetchApi<RemediationWorkflowItem>(`/api/v1/remediations/workflows/${workflowId}/approve`, {
+      method: "POST",
+      body: JSON.stringify(req),
+    }),
+  rejectRemediation: (
+    workflowId: string,
+    req: { approver_name: string; approver_email: string; reason: string }
+  ) =>
+    fetchApi<RemediationWorkflowItem>(`/api/v1/remediations/workflows/${workflowId}/reject`, {
+      method: "POST",
+      body: JSON.stringify(req),
+    }),
+  getRemediationDiff: (workflowId: string) =>
+    fetchApi<{
+      workflow_id: string;
+      target_file_path: string;
+      patch_hash: string;
+      patch_diff: string;
+      changed_files: string[];
+    }>(`/api/v1/remediations/workflows/${workflowId}/diff`),
 };

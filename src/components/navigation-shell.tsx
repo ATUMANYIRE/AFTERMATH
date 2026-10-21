@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   ExternalLink,
+  Wrench,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
@@ -57,6 +58,12 @@ export function NavigationShell({ children }: NavigationShellProps) {
       href: "/investigation",
       icon: Compass,
       badge: "Causal Graph",
+    },
+    {
+      name: "Remediation Studio",
+      href: "/remediation",
+      icon: Wrench,
+      badge: "Sandbox Fix",
     },
     {
       name: "Agent Activity",

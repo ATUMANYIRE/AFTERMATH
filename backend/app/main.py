@@ -12,7 +12,8 @@ from app.database import engine, Base, AsyncSessionLocal
 from app.api.router import api_router
 from app.api.health import router as health_router
 from app.api.experiments import router as experiments_direct_router
-from app.services.seed_data import seed_initial_data
+from app.api.remediation import router as remediation_direct_router
+from app.services.seed_data import seed_initial_data, ensure_baseline_remediation
 
 # Configure logging
 logging.basicConfig(
@@ -36,6 +37,7 @@ async def lifespan(app: FastAPI):
             logger.info("Deterministic seed fixtures successfully loaded.")
         else:
             logger.info("Seed data already present. Skipping insertion.")
+        await ensure_baseline_remediation(session)
 
     yield
     # Shutdown
@@ -71,8 +73,9 @@ async def global_exception_handler(request: Request, exc: Exception):
 # Root Probes (Kubernetes / Docker default paths)
 app.include_router(health_router)
 
-# Direct root experiments route /api/experiments/* conforming strictly to prompt spec
+# Direct root experiments and remediations route conforming strictly to prompt spec
 app.include_router(experiments_direct_router, prefix="/api")
+app.include_router(remediation_direct_router, prefix="/api")
 
 # Mount main API router under prefix (e.g. /api/v1)
 app.include_router(api_router, prefix=settings.API_PREFIX)

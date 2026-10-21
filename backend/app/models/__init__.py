@@ -13,6 +13,7 @@ from app.models.idempotency_record import IdempotencyRecord
 from app.models.causal_node import CausalNode
 from app.models.causal_edge import CausalEdge
 from app.models.blast_radius_report import BlastRadiusReport
+from app.models.remediation_workflow import RemediationWorkflow
 
 __all__ = [
     "Release",
@@ -27,4 +28,5 @@ __all__ = [
     "CausalNode",
     "CausalEdge",
     "BlastRadiusReport",
+    "RemediationWorkflow",
 ]

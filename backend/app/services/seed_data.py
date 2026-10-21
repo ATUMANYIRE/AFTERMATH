@@ -377,4 +377,63 @@ async def seed_initial_data(db: AsyncSession) -> bool:
     from app.services.causal_engine import CausalGraphEngine
     await CausalGraphEngine.ensure_baseline_graph(db, "rel-2026-001")
 
+    # 11. Seed Baseline Remediation Workflow
+    await ensure_baseline_remediation(db)
+
     return True
+
+
+async def ensure_baseline_remediation(db: AsyncSession) -> None:
+    """Ensures deterministic baseline remediation workflow is seeded for rel-2026-001."""
+    from app.models.remediation_workflow import RemediationWorkflow
+    from app.services.remediation_engine import generate_remediation_diff
+    
+    existing_wf = (await db.execute(select(RemediationWorkflow).where(RemediationWorkflow.id == "rem-wf-001"))).scalars().first()
+    if existing_wf is not None:
+        return
+
+    diff_text, patch_hash, changed_files, _ = generate_remediation_diff("services/payment_worker/processor.py")
+    base_time = datetime(2026, 10, 20, 14, 0, 0)
+
+    wf = RemediationWorkflow(
+        id="rem-wf-001",
+        release_id="rel-2026-001",
+        triggering_experiment_id="exp-vuln-001",
+        violated_invariant="INV-PAY-001: Exactly-One-Charge-Per-Purchase",
+        causal_node_id="node-inv-001",
+        source_commit="a8f9c21b4d08",
+        target_file_path="services/payment_worker/processor.py",
+        patch_diff=diff_text,
+        patch_hash=patch_hash,
+        changed_files=changed_files,
+        status="PATCH_PROPOSED",
+        agent_provider="reference_remediation_engine",
+        agent_model="GitLab Duo Code Assistant (Emulated Reference Engine)",
+        tool_execution_records=[
+            {
+                "step": 1,
+                "tool": "ast_concurrency_analyzer",
+                "action": "locate_race_window",
+                "details": "Discovered unprotected asynchronous gap between idempotency check and write in services/payment_worker/processor.py",
+                "timestamp": (base_time - timedelta(minutes=15)).isoformat(),
+            },
+            {
+                "step": 2,
+                "tool": "patch_generator",
+                "action": "synthesize_atomic_barrier",
+                "details": "Injected asyncio.Lock barrier and in-flight reservation map to serialize duplicate attempts",
+                "timestamp": (base_time - timedelta(minutes=10)).isoformat(),
+            },
+        ],
+        validation_results={},
+        approval_status="PENDING",
+        approval_decision=None,
+        remediation_branch="remediation/rem-wf-001-atomic-idempotency",
+        gitlab_mr_url=None,
+        gitlab_mr_status="BLOCKED (External Auth Required)",
+        created_at=base_time - timedelta(minutes=10),
+        updated_at=base_time - timedelta(minutes=10),
+    )
+    db.add(wf)
+    await db.commit()
+

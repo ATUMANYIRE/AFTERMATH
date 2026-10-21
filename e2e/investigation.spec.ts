@@ -31,7 +31,7 @@ test.describe("Causal Graph & Blast Radius Workspace E2E", () => {
     await expect(page.locator("text=Inspect Consequence in Time Machine")).toBeVisible();
 
     // 4. Test Counterfactual Variant Switcher
-    const repairedTab = page.locator("button:has-text('Repaired Release (Duo Verified)')");
+    const repairedTab = page.locator("button:has-text('Repaired Release (Engine Verified)')");
     await repairedTab.click();
 
     // Verify exposure drops to $0.00 and invariant is preserved

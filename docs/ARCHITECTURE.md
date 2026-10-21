@@ -36,6 +36,7 @@ flowchart TD
         W_Overview["Overview Workspace<br/>(/)"]
         W_TimeMachine["Release Time Machine<br/>(/time-machine)"]
         W_Investigation["Investigation Workspace<br/>(/investigation)"]
+        W_Remediation["Remediation Studio<br/>(/remediation)"]
         W_AgentActivity["Agent Activity<br/>(/agent-activity)"]
         W_ReleaseControl["Release Control<br/>(/release-control)"]
     end
@@ -221,3 +222,21 @@ AFTERMATH integrates with GitLab Duo:
 2. **Input Validation**: Pydantic v2 schemas reject malformed payloads with 422 Unprocessable Entity.
 3. **Immutable Audit Trail**: Human approvals and gate status changes generate cryptographic audit event logs (`audit_events` table).
 4. **No Simulated Production Deployment**: Real releases are blocked or certified for staging; production deployment is never simulated as real.
+
+---
+
+## 8. Autonomous Remediation & Isolated Worktree Sandbox (Milestone 4)
+
+Milestone 4 introduces genuine, supervised code remediation:
+1. **Target Concurrency Defect**: `services/payment_worker/processor.py` represents the real payment settlement worker. Under concurrent retries, missing synchronization violates `INV-PAY-001` (multiple debits per order).
+2. **Unified Diff Synthesis**: The remediation engine compares the unpatched target against an atomic barrier implementation (`asyncio.Lock` with in-flight reservation map), generating a standard GNU unified diff with SHA-256 fingerprinting.
+3. **Dual-Phase Sandboxed Verification**:
+   - Creates an ephemeral worktree in a temporary directory.
+   - Executes `pytest services/payment_worker/test_processor.py` against unpatched code (verifying failure: Exit Code 1, 5 debits).
+   - Applies the patch in the sandbox.
+   - Executes `pytest` against patched code (verifying resolution: Exit Code 0, 3/3 passed).
+4. **State Machine Transitions**:
+   `DETECTED` $\to$ `INVESTIGATING` $\to$ `PATCH_PROPOSED` $\to$ `VALIDATING` $\to$ `AWAITING_APPROVAL` $\to$ `APPROVED / COMPLETED` (or `REJECTED`).
+5. **Supervised Gatekeeper**:
+   Autonomous auto-merge is prohibited. Progression requires human approval (name, email, note) or rejection (reviewer, reason), writing immutable records to `audit_events`.
+

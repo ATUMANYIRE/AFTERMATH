@@ -25,15 +25,16 @@ Continuous Delivery pipelines test code changes against static unit suites and i
 
 ---
 
-## The Five Workspaces
+## The Six Workspaces
 
 | Workspace | Route | Purpose | Key Capabilities |
 |:----------|:------|:--------|:-----------------|
-| **A. Overview** | `/` | Operational Control Center | Active investigations, consequences prevented metric ($1,240 saved), system readiness score (98.4%), and release registry. |
-| **B. Release Time Machine** | `/time-machine` | **The Signature Centerpiece** | Split timeline comparison of two actual runs: unpatched vulnerable run vs Duo-repaired run. Synced event traces, latency delta, and GitLab CI artifacts. |
-| **C. Investigation Workspace** | `/investigation` | Blast Radius & Topology | Interactive component consequence graph, suspected failure paths, root cause hypotheses, and verified findings. |
-| **D. Agent Activity** | `/agent-activity` | GitLab Duo Orchestration | Live execution traces of GitLab Duo Consequence Auditor and Remediation Engineer agents, tool calls, and honest setup guidance. |
-| **E. Release Control** | `/release-control` | DevSecOps Governance | Automated policy gates, staging readiness certification, human sign-off actions, and immutable audit logs. |
+| **A. Overview** | `/` | Operational Control Center | Active investigations, consequences prevented metric ($1,500 saved), system readiness score (98.4%), and release registry. |
+| **B. Release Time Machine** | `/time-machine` | **The Signature Centerpiece** | Split timeline comparison of two actual runs: unpatched vulnerable run vs repaired run. Synced event traces, latency delta, and ledger proof. |
+| **C. Investigation Workspace** | `/investigation` | Causal Graph & Blast Radius | Interactive directed graph connecting code commits to runtime failures, epistemic provenance, and counterfactual analysis. |
+| **D. Remediation Studio** | `/remediation` | **Autonomous Fix & Verification** | AST concurrency analysis, GNU unified diff synthesis, ephemeral sandboxed pytest execution (pre-patch fails, post-patch passes), and human gatekeeper approvals. |
+| **E. Agent Activity** | `/agent-activity` | Agent Execution Traces | Full execution logs, tool call arguments, and honest setup guidance for GitLab Duo integrations. |
+| **F. Release Control** | `/release-control` | DevSecOps Governance | Automated policy gates, staging readiness certification, human sign-off actions, and immutable audit logs. |
 
 ---
 
@@ -218,6 +219,9 @@ AFTERMATH supports real GitLab Duo agents. To enable live Duo integrations:
 - **Milestone 2 Acceptance Report**: [`docs/MILESTONE_2_ACCEPTANCE.md`](docs/MILESTONE_2_ACCEPTANCE.md)
 - **Milestone 3 Baseline Audit**: [`docs/M3_BASELINE.md`](docs/M3_BASELINE.md)
 - **Milestone 3 Acceptance Report**: [`docs/MILESTONE_3_ACCEPTANCE.md`](docs/MILESTONE_3_ACCEPTANCE.md)
+- **Milestone 4 Baseline Audit**: [`docs/M4_BASELINE_AUDIT.md`](docs/M4_BASELINE_AUDIT.md)
+- **Remediation Security & Sandbox Architecture**: [`docs/REMEDIATION_SECURITY.md`](docs/REMEDIATION_SECURITY.md)
+- **Milestone 4 Acceptance Report**: [`docs/MILESTONE_4_ACCEPTANCE.md`](docs/MILESTONE_4_ACCEPTANCE.md)
 - **GitLab Duo Integration & Blocker Report**: [`docs/GITLAB_DUO_INTEGRATION.md`](docs/GITLAB_DUO_INTEGRATION.md)
 
 ---

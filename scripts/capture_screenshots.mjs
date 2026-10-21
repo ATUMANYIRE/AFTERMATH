@@ -80,13 +80,33 @@ async function capture() {
       }
     }
 
-    // 5. Agent Activity
+    // 5. Remediation Studio (Milestone 4 Autonomous Repair)
+    console.log(`Capturing remediation (${vp.label})...`);
+    await page.goto("http://localhost:3000/remediation", { waitUntil: "networkidle", timeout: 20000 });
+    await page.waitForTimeout(1000);
+    await page.screenshot({ path: path.join(OUT_DIR, `remediation_${vp.label}.png`), fullPage: true });
+
+    // If desktop, capture Sandbox Execution Proof tab as well
+    if (vp.label === "desktop") {
+      try {
+        const sandboxTab = page.locator("button:has-text('Sandbox Execution Proof')");
+        if (await sandboxTab.isVisible()) {
+          await sandboxTab.click();
+          await page.waitForTimeout(1000);
+          await page.screenshot({ path: path.join(OUT_DIR, `remediation_sandbox_desktop.png`), fullPage: true });
+        }
+      } catch (e) {
+        console.warn("Could not capture sandbox tab:", e.message);
+      }
+    }
+
+    // 6. Agent Activity
     console.log(`Capturing agent_activity (${vp.label})...`);
     await page.goto("http://localhost:3000/agent-activity", { waitUntil: "networkidle", timeout: 20000 });
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(OUT_DIR, `agent_activity_${vp.label}.png`), fullPage: true });
 
-    // 6. Release Control
+    // 7. Release Control
     console.log(`Capturing release_control (${vp.label})...`);
     await page.goto("http://localhost:3000/release-control", { waitUntil: "networkidle", timeout: 20000 });
     await page.waitForTimeout(1000);

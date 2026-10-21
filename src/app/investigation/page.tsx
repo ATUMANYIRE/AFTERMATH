@@ -219,7 +219,7 @@ export default function InvestigationPage() {
                     : "text-[#64748B] hover:text-[#0F172A]"
                 }`}
               >
-                Repaired Release (Duo Verified)
+                Repaired Release (Engine Verified)
               </button>
               <button
                 onClick={() => {

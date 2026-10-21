@@ -1,0 +1,1 @@
+"""Payment Worker target service."""

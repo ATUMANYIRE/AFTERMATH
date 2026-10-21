@@ -88,6 +88,53 @@ export interface TransactionItem {
   created_at: string;
 }
 
+export interface SuperpositionScenarioItem {
+  scenario_id: string;
+  name: string;
+  fault_injection: string;
+  vulnerable: {
+    verdict: string;
+    invariant_status: string;
+    duplicate_debits: number;
+    exposure_usd: number;
+    p95_latency_ms: number;
+    error_count: number;
+    affected_services: string[];
+  };
+  repaired: {
+    verdict: string;
+    invariant_status: string;
+    duplicate_debits: number;
+    exposure_usd: number;
+    p95_latency_ms: number;
+    error_count: number;
+    affected_services: string[];
+  };
+  provenance: string;
+  uncertainty: string;
+}
+
+export interface ReleaseSuperpositionItem {
+  release_id: string;
+  version_tag: string;
+  commit_hash: string;
+  generated_at: string;
+  recommendation: {
+    verdict: string;
+    confidence_score: number;
+    headline: string;
+    evidence_summary: string;
+    caveats: string[];
+  };
+  scenario_matrix: SuperpositionScenarioItem[];
+  blast_radius_delta: {
+    financial_exposure_mitigated_usd: number;
+    duplicate_charges_prevented: number;
+    downstream_services_protected: string[];
+    p95_latency_improvement_ms: number;
+  };
+}
+
 export interface ScenarioConfig {
   scenario_id: string;
   concurrency: number;
@@ -555,4 +602,8 @@ export const api = {
       patch_diff: string;
       changed_files: string[];
     }>(`/api/v1/remediations/workflows/${workflowId}/diff`),
+
+  // Milestone 5 Release Superposition
+  getReleaseSuperposition: (releaseId: string) =>
+    fetchApi<ReleaseSuperpositionItem>(`/api/v1/release-control/${releaseId}/superposition`),
 };

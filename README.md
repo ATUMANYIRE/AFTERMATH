@@ -34,7 +34,7 @@ Continuous Delivery pipelines test code changes against static unit suites and i
 | **C. Investigation Workspace** | `/investigation` | Causal Graph & Blast Radius | Interactive directed graph connecting code commits to runtime failures, epistemic provenance, and counterfactual analysis. |
 | **D. Remediation Studio** | `/remediation` | **Autonomous Fix & Verification** | AST concurrency analysis, GNU unified diff synthesis, ephemeral sandboxed pytest execution (pre-patch fails, post-patch passes), and human gatekeeper approvals. |
 | **E. Agent Activity** | `/agent-activity` | Agent Execution Traces | Full execution logs, tool call arguments, and honest setup guidance for GitLab Duo integrations. |
-| **F. Release Control** | `/release-control` | DevSecOps Governance | Automated policy gates, staging readiness certification, human sign-off actions, and immutable audit logs. |
+| **F. Release Control** | `/release-control` | **Release Superposition & Governance** | Multi-scenario superposition matrix (5 fault injection profiles), evidence-backed release recommendations, automated policy gates, and human sign-off. |
 
 ---
 
@@ -222,7 +222,12 @@ AFTERMATH supports real GitLab Duo agents. To enable live Duo integrations:
 - **Milestone 4 Baseline Audit**: [`docs/M4_BASELINE_AUDIT.md`](docs/M4_BASELINE_AUDIT.md)
 - **Remediation Security & Sandbox Architecture**: [`docs/REMEDIATION_SECURITY.md`](docs/REMEDIATION_SECURITY.md)
 - **Milestone 4 Acceptance Report**: [`docs/MILESTONE_4_ACCEPTANCE.md`](docs/MILESTONE_4_ACCEPTANCE.md)
-- **GitLab Duo Integration & Blocker Report**: [`docs/GITLAB_DUO_INTEGRATION.md`](docs/GITLAB_DUO_INTEGRATION.md)
+- **Final Release Audit (Milestone 5)**: [`docs/FINAL_RELEASE_AUDIT.md`](docs/FINAL_RELEASE_AUDIT.md)
+- **GitLab Duo Evidence & Blocker Report**: [`docs/GITLAB_DUO_EVIDENCE.md`](docs/GITLAB_DUO_EVIDENCE.md)
+- **Known Technical Limitations & Boundaries**: [`docs/KNOWN_LIMITATIONS.md`](docs/KNOWN_LIMITATIONS.md)
+- **Three-Minute Video Demo Script**: [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md)
+- **Devpost Project Submission Copy**: [`docs/DEVPOST_SUBMISSION.md`](docs/DEVPOST_SUBMISSION.md)
+- **Final Acceptance & Verification Report**: [`docs/FINAL_ACCEPTANCE_REPORT.md`](docs/FINAL_ACCEPTANCE_REPORT.md)
 
 ---
 

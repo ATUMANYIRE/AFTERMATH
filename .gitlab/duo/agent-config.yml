@@ -1,0 +1,28 @@
+# .gitlab/duo/agent-config.yml
+# Official GitLab Duo Agent Platform Execution Environment Configuration
+# Configures how custom flows execute inside CI/CD runners for AFTERMATH
+
+image: "python:3.11-slim"
+
+setup_script:
+  - apt-get update && apt-get install -y git build-essential curl
+  - pip install -r backend/requirements.txt
+
+network_policy:
+  allowed_domains:
+    - "gitlab.com"
+    - "registry.npmjs.org"
+    - "pypi.org"
+    - "files.pythonhosted.org"
+  denied_domains: []
+  include_recommended_allowed: true
+  allow_all_unix_sockets: false
+
+cache:
+  paths:
+    - ".venv/"
+    - "~/.cache/pip"
+  key:
+    files:
+      - "backend/requirements.txt"
+    prefix: "aftermath-duo-cache"

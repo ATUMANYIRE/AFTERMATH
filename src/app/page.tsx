@@ -181,7 +181,7 @@ export default function OverviewPage() {
               Asynchronous checkout fan-out omitted distributed mutex locking on idempotency keys.
             </p>
             <p className="text-xs text-[#64748B]">
-              Simulated 450 concurrent requests in the Release Time Machine revealed 27 double charges. Duo Agent synthesized a Redis SETNX lock that eliminated all anomalies.
+              Simulated 450 concurrent requests in the Release Time Machine revealed 27 double charges. AFTERMATH&apos;s Remediation Engine synthesized an atomic idempotency barrier that eliminated all anomalies.
             </p>
           </div>
 

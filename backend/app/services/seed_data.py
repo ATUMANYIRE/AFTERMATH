@@ -219,18 +219,18 @@ async def seed_initial_data(db: AsyncSession) -> bool:
     )
     db.add(ev_3)
 
-    # 6. Agent Sessions
+    # 6. Agent Sessions (Deterministic Demo Benchmark Fixtures)
     sess_1 = AgentSession(
         id="sess-001",
         release_id="rel-2026-001",
-        agent_name="GitLab Duo Consequence Auditor",
+        agent_name="GitLab Duo Consequence Auditor (Demo Benchmark)",
         agent_role="consequence_auditor",
         status="completed",
         goal="Audit release diff a8f9c21b4d08 for concurrent transaction safety and run empirical consequence timelines.",
         prompt="Analyze git diff between main and feat/distributed-checkout-pipeline. Focus on payment retry flows.",
-        summary="Detected critical vulnerability in async settlement fan-out. Executed experiment exp-vuln-001 reproducing double-charging.",
+        summary="[Demo Fixture] Detected critical vulnerability in async settlement fan-out. Executed experiment exp-vuln-001 reproducing double-charging.",
         tools_invoked=["gitlab_git_diff", "time_machine_simulator", "log_analyzer", "patch_synthesizer"],
-        gitlab_duo_session_id="duo_sess_8921a9",
+        gitlab_duo_session_id="duo_sess_8921a9_demo",
         gitlab_flow_name="consequence_audit_pipeline",
         started_at=base_time - timedelta(minutes=50),
         completed_at=base_time - timedelta(minutes=40),
@@ -240,14 +240,14 @@ async def seed_initial_data(db: AsyncSession) -> bool:
     sess_2 = AgentSession(
         id="sess-002",
         release_id="rel-2026-001",
-        agent_name="GitLab Duo Remediation Engineer",
+        agent_name="GitLab Duo Remediation Engineer (Demo Benchmark)",
         agent_role="remediation_engineer",
         status="completed",
         goal="Synthesize atomic idempotency lock patch and verify in sandbox experiment.",
         prompt="Synthesize a minimal diff introducing Redis SETNX lock with safe fallback and re-run consequence simulation.",
-        summary="Synthesized patch in checkout/idempotency.py. Executed exp-rep-001: 0 anomalies, 0 errors, SLA met.",
+        summary="[Demo Fixture] Synthesized patch in checkout/idempotency.py. Executed exp-rep-001: 0 anomalies, 0 errors, SLA met.",
         tools_invoked=["code_synthesizer", "time_machine_simulator", "ast_validator"],
-        gitlab_duo_session_id="duo_sess_8922b1",
+        gitlab_duo_session_id="duo_sess_8922b1_demo",
         gitlab_flow_name="remediation_synthesis_flow",
         started_at=base_time - timedelta(minutes=30),
         completed_at=base_time - timedelta(minutes=20),

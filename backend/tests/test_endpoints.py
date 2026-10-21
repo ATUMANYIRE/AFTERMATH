@@ -117,3 +117,21 @@ async def test_release_control_and_approval(client: AsyncClient):
     assert data_updated["gates_passed"] == 4
     assert data_updated["can_promote"] is True
     assert data_updated["overall_status"] == "approved_for_staging"
+
+
+@pytest.mark.asyncio
+async def test_release_superposition_endpoint(client: AsyncClient):
+    """Verifies Milestone 5 Release Superposition Multi-Scenario Matrix."""
+    resp = await client.get("/api/v1/release-control/rel-2026-001/superposition")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["release_id"] == "rel-2026-001"
+    assert data["recommendation"]["verdict"] == "CONDITIONAL_APPROVAL"
+    assert len(data["scenario_matrix"]) == 5
+    assert data["blast_radius_delta"]["financial_exposure_mitigated_usd"] == 1500.00
+
+    # Verify first scenario in matrix
+    s1 = data["scenario_matrix"][0]
+    assert s1["scenario_id"] == "lost-response-retry"
+    assert s1["vulnerable"]["verdict"] == "FAIL"
+    assert s1["repaired"]["verdict"] == "PASS"

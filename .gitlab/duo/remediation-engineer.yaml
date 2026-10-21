@@ -1,56 +1,44 @@
-# GitLab Duo Agent Platform Specification: Remediation Engineer Agent Contract
-# Schema Version: 2026-03 (GitLab Duo Custom Agents & Workflows)
-apiVersion: duo.gitlab.com/v1alpha1
-kind: DuoAgent
+# ==============================================================================
+# GitLab Duo Flow Registry v1 Specification: Remediation Engineer Flow
+# Project: atumanyire-labs/aftermath
+# ==============================================================================
+version: "1.0"
+
 metadata:
-  name: remediation-engineer
-  namespace: atumanyire-labs/aftermath
+  name: "aftermath-remediation-engineer"
   displayName: "GitLab Duo Remediation Engineer"
-  version: "1.0.0-draft"
-  description: "Automated code remediation agent prepared for AFTERMATH Milestone 4. Synthesizes targeted patches, distributed idempotency barriers, and schema migrations when Consequence Auditor detects invariant violations."
+  description: "Autonomous code remediation flow that synthesizes atomic idempotency barriers, executes worktree verification, and prepares merge requests."
+  version: "1.2.0"
 
-spec:
-  model: "claude-3-5-sonnet"
-  temperature: 0.2
+environment:
+  coding_environment: full
 
-  triggers:
-    - event: custom.aftermath_consequence_audit.invariant_failed
-      filter: "severity in ['CRITICAL', 'HIGH']"
+triggers:
+  - type: custom.aftermath_consequence_audit.invariant_failed
+  - type: mention
+  - type: assign
 
-  permissions:
-    scopes:
-      - "read_repository"
-      - "write_repository"
-      - "create_merge_request"
-      - "trigger_pipeline"
-
-  contract:
+components:
+  - name: "synthesize_patch"
+    type: AgentComponent
+    prompt_id: "remediation_synthesis_prompt"
     inputs:
-      - name: release_id
-        type: string
-        description: "The blocked release identifier."
-      - name: violated_invariant
-        type: string
-        description: "The invariant expression that was breached (e.g. INV-PAY-001)."
-      - name: causal_path
-        type: array
-        description: "The directed causal chain from code diff to broken invariant."
-      - name: failed_experiment_id
-        type: string
-        description: "The vulnerable counterfactual experiment proving the failure."
+      - from: "context:release_id"
+        as: "release_id"
+      - from: "context:violated_invariant"
+        as: "violated_invariant"
 
-    expectedDeliverables:
-      - name: remediation_branch
-        type: string
-        description: "Branch name: duo-fix/{release_id}-{slug}"
-      - name: patch_diff
-        type: string
-        description: "Minimal atomic code changes introducing durable unique constraints and lock barriers."
-      - name: counterfactual_verification_proof
-        type: object
-        description: "Re-run results of consequence engine proving duplicate charges drop to 0 under identical seeds."
+  - name: "validate_patch_sandbox"
+    type: ToolComponent
+    tool: "aftermath_sandbox_verifier"
+    endpoint: "http://aftermath-backend:8000/api/v1/remediations/workflows/{workflow_id}/validate"
+    method: "POST"
 
-    validationGate:
-      mustPassInvariant: "INV-PAY-001"
-      maxAllowedDoubleDebits: 0
-      mustIncludeAlembicMigrationIfSchemaChanged: true
+prompts:
+  - id: "remediation_synthesis_prompt"
+    system: >
+      You are the GitLab Duo Remediation Engineer for AFTERMATH.
+      When safety invariant INV-PAY-001 fails during consequence simulation,
+      inspect services/payment_worker/processor.py and synthesize an atomic idempotency barrier
+      with compound unique constraints or asyncio.Lock deduplication.
+      Ensure duplicate retries drop to 0. Do NOT auto-merge without human approval.

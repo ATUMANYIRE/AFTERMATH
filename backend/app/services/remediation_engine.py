@@ -39,19 +39,72 @@ ALLOWED_TARGET_PREFIXES = (
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
+# Forbidden tokens in untrusted patches to prevent shell injection and subprocess abuse
+FORBIDDEN_AST_TOKENS = [
+    "os.system",
+    "subprocess.Popen",
+    "subprocess.call",
+    "subprocess.run",
+    "shutil.rmtree",
+    "eval(",
+    "exec(",
+    "__import__",
+    "socket.socket",
+    "urllib.request",
+]
+
+FORBIDDEN_PATH_CHARS = set(";&|`$<>!*?{}[]\"'\n\r\0")
+
+
+def audit_patch_safety(source_code: str) -> None:
+    """
+    Verifies that generated or proposed patch source does not introduce
+    arbitrary subprocess execution, shell escapes, or network socket access.
+    """
+    if len(source_code) > 200_000:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Security violation: Patch payload exceeds 200KB limit."
+        )
+
+    for token in FORBIDDEN_AST_TOKENS:
+        if token in source_code:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Security violation: Untrusted token '{token}' detected in patch diff. Arbitrary code execution is unsupported."
+            )
+
+
 def validate_target_path(target_path_str: str) -> Path:
     """
-    Validates that the target path does not escape the project boundary
-    and strictly resides within an allowlisted remediation prefix.
+    Validates that the target path does not escape the project boundary,
+    contains no shell metacharacters or symlinks, and strictly resides
+    within an allowlisted remediation prefix.
     """
     normalized = target_path_str.replace("\\", "/").strip().lstrip("/")
     
+    # 1. Shell metacharacter / injection prevention
+    if any(char in normalized for char in FORBIDDEN_PATH_CHARS):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Security violation: Shell metacharacters detected in path."
+        )
+
+    # 2. Path traversal / absolute path rejection
     if ".." in normalized or normalized.startswith("/") or ":" in normalized:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Security violation: Path traversal or invalid characters detected."
         )
 
+    # 3. File extension restriction
+    if not normalized.endswith(".py"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Security violation: Target file must be a Python source file (.py)."
+        )
+
+    # 4. Strict directory allowlist
     if not any(normalized.startswith(prefix) for prefix in ALLOWED_TARGET_PREFIXES):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -63,6 +116,13 @@ def validate_target_path(target_path_str: str) -> Path:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Security violation: Resolved target escapes project root."
+        )
+
+    # 5. Symlink protection
+    if target_full_path.is_symlink():
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Security violation: Symlink detected in target file path."
         )
 
     if not target_full_path.exists():
@@ -218,6 +278,17 @@ class PaymentProcessor:
     def get_charges_for_order(self, order_id: str) -> List[Dict[str, Any]]:
         """Returns all settled debit transactions for a given order."""
         return [t.to_dict() for t in self.ledger if t.order_id == order_id]
+
+
+# Safe demonstration alias
+VulnerablePaymentProcessor = PaymentProcessor
+
+# Expose Durable Transactional Payment Processor (Milestone 5)
+from services.payment_worker.durable_processor import (
+    DurablePaymentProcessor,
+    IdempotencyConflictError,
+    PaymentProcessingError,
+)
 '''
 
 
@@ -254,10 +325,13 @@ def execute_sandbox_validation(
     patched_source: str,
 ) -> Dict[str, Any]:
     """
-    Spawns an isolated sandbox worktree, executes real pytest against both the
-    unpatched target code (verifying the failure condition) and the patched code
-    (verifying the invariant holds), capturing exact stdout, stderr, and timings.
+    Spawns an isolated sandbox worktree, audits patch safety against shell/subprocess abuse,
+    and executes real pytest against both the unpatched target code (verifying failure condition)
+    and the patched code (verifying invariant holds), capturing exact stdout, stderr, and timings.
     """
+    # 1. Audit patch source code against dangerous calls and payload size limit
+    audit_patch_safety(patched_source)
+
     target_rel = target_file_path.replace("\\", "/").strip().lstrip("/")
     services_dir = PROJECT_ROOT / "services"
     if not services_dir.exists():
@@ -273,6 +347,15 @@ def execute_sandbox_validation(
     else:
         python_bin = sys.executable
 
+    # 2. Construct sanitized execution environment (Zero credential leakage)
+    clean_env = {
+        "PYTHONPATH": ".",
+        "SYSTEMROOT": os.environ.get("SYSTEMROOT", "C:\\Windows"),
+        "PATH": os.environ.get("PATH", ""),
+        "PYTHONHASHSEED": "42",
+        "AFTERMATH_SANDBOX_ACTIVE": "true",
+    }
+
     with tempfile.TemporaryDirectory(prefix="aftermath_worktree_") as temp_dir_str:
         sandbox_path = Path(temp_dir_str)
         sandbox_services = sandbox_path / "services"
@@ -281,36 +364,47 @@ def execute_sandbox_validation(
         shutil.copytree(services_dir, sandbox_services)
 
         cmd = [python_bin, "-m", "pytest", "services/payment_worker/test_processor.py", "-v"]
-        run_env = dict(os.environ)
-        run_env["PYTHONPATH"] = "."
 
-        # Step 1: Pre-patch baseline execution (Expect failure on concurrent invariant)
-        t0 = time.time()
-        pre_proc = subprocess.run(
-            cmd,
-            cwd=str(sandbox_path),
-            capture_output=True,
-            text=True,
-            env=run_env,
-            timeout=30,
-        )
-        pre_duration = round(time.time() - t0, 3)
+        try:
+            # Step 1: Pre-patch baseline execution (Expect failure on concurrent invariant)
+            t0 = time.time()
+            pre_proc = subprocess.run(
+                cmd,
+                cwd=str(sandbox_path),
+                capture_output=True,
+                text=True,
+                env=clean_env,
+                timeout=15,
+            )
+            pre_duration = round(time.time() - t0, 3)
 
-        # Step 2: Apply patch in sandbox
-        sandbox_target_file = sandbox_path / target_rel
-        sandbox_target_file.write_text(patched_source, encoding="utf-8")
+            # Step 2: Apply patch in sandbox (with symlink verification)
+            sandbox_target_file = sandbox_path / target_rel
+            if sandbox_target_file.is_symlink():
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Security violation: Symlink detected in sandbox worktree target."
+                )
 
-        # Step 3: Post-patch validation execution (Expect all tests passing)
-        t1 = time.time()
-        post_proc = subprocess.run(
-            cmd,
-            cwd=str(sandbox_path),
-            capture_output=True,
-            text=True,
-            env=run_env,
-            timeout=30,
-        )
-        post_duration = round(time.time() - t1, 3)
+            sandbox_target_file.write_text(patched_source, encoding="utf-8")
+
+            # Step 3: Post-patch validation execution (Expect all tests passing)
+            t1 = time.time()
+            post_proc = subprocess.run(
+                cmd,
+                cwd=str(sandbox_path),
+                capture_output=True,
+                text=True,
+                env=clean_env,
+                timeout=15,
+            )
+            post_duration = round(time.time() - t1, 3)
+
+        except subprocess.TimeoutExpired:
+            raise HTTPException(
+                status_code=status.HTTP_408_REQUEST_TIMEOUT,
+                detail="Security violation: Execution exceeded 15s sandbox timeout limit (resource exhaustion protection)."
+            )
 
         # Invariant analysis
         pre_failed = (pre_proc.returncode != 0)

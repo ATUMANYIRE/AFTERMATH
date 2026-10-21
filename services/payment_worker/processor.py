@@ -110,3 +110,14 @@ class PaymentProcessor:
     def get_charges_for_order(self, order_id: str) -> List[Dict[str, Any]]:
         """Returns all settled debit transactions for a given order."""
         return [t.to_dict() for t in self.ledger if t.order_id == order_id]
+
+
+# Safe demonstration alias
+VulnerablePaymentProcessor = PaymentProcessor
+
+# Expose Durable Transactional Payment Processor (Milestone 5)
+from services.payment_worker.durable_processor import (
+    DurablePaymentProcessor,
+    IdempotencyConflictError,
+    PaymentProcessingError,
+)

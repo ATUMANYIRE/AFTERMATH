@@ -1,9 +1,10 @@
 # ==============================================================================
-# AFTERMATH — GitLab CI/CD DevSecOps Pipeline
-# GitLab Life After Code Hackathon
+# AFTERMATH — GitLab CI/CD DevSecOps Pipeline (Milestone 5)
+# Comprehensive 9-Stage DevSecOps Pipeline for GitLab Life After Code Hackathon
 # ==============================================================================
 
 stages:
+  - security
   - test
   - build
   - consequence_simulate
@@ -13,13 +14,39 @@ variables:
   PYTHON_VERSION: "3.11"
   NODE_VERSION: "20"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  POSTGRES_DB: aftermath_ci
-  POSTGRES_USER: runner
-  POSTGRES_PASSWORD: runner_password
-  POSTGRES_HOST_AUTH_METHOD: trust
 
 # ------------------------------------------------------------------------------
-# Backend Test Stage: Unit, Integration, & Alembic Migrations
+# 1. Security Stage: Secret Detection & Dependency Auditing
+# ------------------------------------------------------------------------------
+security:secret_detection:
+  stage: security
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache grep bash
+  script:
+    - echo "Executing Secret Detection scan across repository..."
+    - |
+      # Check for exposed private tokens or secret keys in committed files
+      if grep -rnE "glpat-[A-Za-z0-9_-]{20,}" --exclude-dir=".git" --exclude="*.md" .; then
+        echo "ERROR: Exposed GitLab Personal Access Token detected!"
+        exit 1
+      fi
+    - echo "Secret detection passed: No exposed credentials found."
+
+security:dependency_check:
+  stage: security
+  image: python:3.11-slim
+  before_script:
+    - cd backend
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+  script:
+    - echo "Auditing Python dependency tree for incompatibilities..."
+    - pip check
+    - echo "Dependency check nominal."
+
+# ------------------------------------------------------------------------------
+# 2. Test Stage: Unit, Integration, Durable Concurrency & Migrations
 # ------------------------------------------------------------------------------
 backend:test:
   stage: test
@@ -33,21 +60,20 @@ backend:test:
     - pip install --upgrade pip
     - pip install -r requirements.txt
   script:
+    - export PYTHONPATH="backend;.backend;."
     - python -m alembic upgrade head
-    - pytest -v --tb=short
+    - pytest -v --tb=short backend/tests services/payment_worker/test_durable_processor.py
   artifacts:
     when: always
-    reports:
-      junit: backend/junit.xml
     paths:
       - backend/aftermath.db
     expire_in: 7 days
 
 # ------------------------------------------------------------------------------
-# Frontend Test Stage: Strict TypeScript Verification & Production Bundle
+# 3. Build Stage: Strict TypeScript Verification & Next.js Production Build
 # ------------------------------------------------------------------------------
 frontend:typecheck_and_build:
-  stage: test
+  stage: build
   image: node:20-alpine
   cache:
     key: "${CI_COMMIT_REF_SLUG}-frontend"
@@ -64,7 +90,7 @@ frontend:typecheck_and_build:
     expire_in: 7 days
 
 # ------------------------------------------------------------------------------
-# Consequence Simulation: Release Time Machine Empirical Verification
+# 4. Consequence Simulation: Release Time Machine Empirical Verification
 # ------------------------------------------------------------------------------
 simulation:time_machine:
   stage: consequence_simulate
@@ -84,7 +110,7 @@ simulation:time_machine:
     expire_in: 14 days
 
 # ------------------------------------------------------------------------------
-# Release Control Gatekeeper: Human & Automated SLA Evaluation
+# 5. Release Control Gatekeeper: Human & Automated SLA Evaluation
 # ------------------------------------------------------------------------------
 release:control_gates:
   stage: release_control
@@ -98,5 +124,3 @@ release:control_gates:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: on_success
-    - when: manual
-      allow_failure: true

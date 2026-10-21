@@ -106,17 +106,30 @@ async function capture() {
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(OUT_DIR, `agent_activity_${vp.label}.png`), fullPage: true });
 
-    // 7. Release Control
-    console.log(`Capturing release_control (${vp.label})...`);
+    // 7. Release Superposition & Release Control
+    console.log(`Capturing release_superposition (${vp.label})...`);
     await page.goto("http://localhost:3000/release-control", { waitUntil: "networkidle", timeout: 20000 });
     await page.waitForTimeout(1000);
-    await page.screenshot({ path: path.join(OUT_DIR, `release_control_${vp.label}.png`), fullPage: true });
+    await page.screenshot({ path: path.join(OUT_DIR, `release_superposition_${vp.label}.png`), fullPage: true });
+
+    if (vp.label === "desktop") {
+      try {
+        const gatesTab = page.locator("button:has-text('DevSecOps Policy Gates')");
+        if (await gatesTab.isVisible()) {
+          await gatesTab.click();
+          await page.waitForTimeout(1000);
+          await page.screenshot({ path: path.join(OUT_DIR, `release_control_gates_desktop.png`), fullPage: true });
+        }
+      } catch (e) {
+        console.warn("Could not capture gates tab:", e.message);
+      }
+    }
 
     await context.close();
   }
 
   await browser.close();
-  console.log("Milestone 2 screenshots captured successfully!");
+  console.log("All Milestone 5 screenshots captured successfully!");
 }
 
 capture().catch((err) => {

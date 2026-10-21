@@ -50,3 +50,15 @@ class ReleaseControlStatusResponse(BaseModel):
     can_promote: bool
     gates: List[ApprovalResponse]
     recent_audits: List[AuditEventResponse]
+
+
+class ReleaseSuperpositionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    release_id: str
+    version_tag: str
+    commit_hash: str
+    generated_at: str
+    recommendation: Dict[str, Any]
+    scenario_matrix: List[Dict[str, Any]]
+    blast_radius_delta: Dict[str, Any]

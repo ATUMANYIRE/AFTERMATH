@@ -1,0 +1,12 @@
+.git
+.github
+.gitlab
+node_modules
+.next
+screenshots
+test-results
+backend/.venv
+backend/aftermath.db
+backend/__pycache__
+*.pyc
+.pytest_cache

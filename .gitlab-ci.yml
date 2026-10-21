@@ -37,9 +37,8 @@ security:dependency_check:
   stage: security
   image: python:3.11-slim
   before_script:
-    - cd backend
     - pip install --upgrade pip
-    - pip install -r requirements.txt
+    - pip install -r backend/requirements.txt
   script:
     - echo "Auditing Python dependency tree for incompatibilities..."
     - pip check
@@ -56,12 +55,11 @@ backend:test:
     paths:
       - .cache/pip
   before_script:
-    - cd backend
     - pip install --upgrade pip
-    - pip install -r requirements.txt
+    - pip install -r backend/requirements.txt
   script:
-    - export PYTHONPATH="backend;.backend;."
-    - python -m alembic upgrade head
+    - export PYTHONPATH="backend:."
+    - python -m alembic -c backend/alembic.ini upgrade head
     - pytest -v --tb=short backend/tests services/payment_worker/test_durable_processor.py
   artifacts:
     when: always
@@ -98,9 +96,9 @@ simulation:time_machine:
   dependencies:
     - backend:test
   before_script:
-    - cd backend
-    - pip install -r requirements.txt
+    - pip install -r backend/requirements.txt
   script:
+    - export PYTHONPATH="backend:."
     - echo "Executing AFTERMATH Release Time Machine empirical scenario..."
     - python -c "from app.services.synthetic_payment import payment_service; print('Synthetic payment sandbox verified')"
   artifacts:

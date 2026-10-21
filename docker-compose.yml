@@ -30,16 +30,18 @@ services:
       DATABASE_URL: postgresql+asyncpg://aftermath:aftermath_secure_password@postgres:5432/aftermath
       CORS_ORIGINS: '["http://localhost:3000","http://127.0.0.1:3000"]'
       GITLAB_INSTANCE_URL: ${GITLAB_INSTANCE_URL:-https://gitlab.com}
-      GITLAB_PROJECT_PATH: ${GITLAB_PROJECT_PATH:-atumanyire/aftermath}
+      GITLAB_PROJECT_PATH: ${GITLAB_PROJECT_PATH:-atumanyire-labs/aftermath}
       GITLAB_ACCESS_TOKEN: ${GITLAB_ACCESS_TOKEN:-}
       GITLAB_DUO_ENABLED: ${GITLAB_DUO_ENABLED:-false}
     ports:
       - "8000:8000"
+    volumes:
+      - ./services:/app/services:ro
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
       interval: 10s
       timeout: 5s
       retries: 3

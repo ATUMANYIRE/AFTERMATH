@@ -35,8 +35,15 @@ ALLOWED_TARGET_PREFIXES = (
     "services/payment_worker/",
 )
 
+def _find_project_root() -> Path:
+    current = Path(__file__).resolve()
+    for parent in [current] + list(current.parents):
+        if (parent / "services" / "payment_worker").exists():
+            return parent
+    return current.parents[3] if len(current.parents) > 3 else current.parent
+
 # Project root path resolution
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = _find_project_root()
 
 
 # Forbidden tokens in untrusted patches to prevent shell injection and subprocess abuse

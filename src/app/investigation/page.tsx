@@ -117,13 +117,13 @@ export default function InvestigationPage() {
   if (graphLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-28 bg-white rounded-2xl border border-[#E5E7EB]" />
+        <div className="h-28 bg-white rounded-2xl border border-[#ECEEF1]" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-44 bg-white rounded-2xl border border-[#E5E7EB]" />
+            <div key={i} className="h-44 bg-white rounded-2xl border border-[#ECEEF1]" />
           ))}
         </div>
-        <div className="h-[580px] bg-white rounded-2xl border border-[#E5E7EB]" />
+        <div className="h-[580px] bg-white rounded-2xl border border-[#ECEEF1]" />
       </div>
     );
   }
@@ -134,10 +134,10 @@ export default function InvestigationPage() {
         <div className="w-12 h-12 rounded-full bg-rose-50 text-[#C74747] flex items-center justify-center mx-auto mb-4">
           <ShieldAlert className="w-6 h-6" />
         </div>
-        <h3 className="text-lg font-semibold text-[#111827] mb-1">
+        <h3 className="text-lg font-semibold text-[#191C24] mb-1">
           Causal Graph Unavailable
         </h3>
-        <p className="text-sm text-[#6B7280] mb-6">
+        <p className="text-sm text-[#747B87] mb-6">
           Failed to fetch directed causal graph for {selectedRelease}.
         </p>
         <Button onClick={() => refetchGraph()} variant="primary" icon={<RefreshCw className="w-4 h-4" />}>
@@ -162,17 +162,17 @@ export default function InvestigationPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EFF4FE] text-[#3558D4] border border-[#BFD5FB]/60">
-              <Compass className="w-3 h-3 text-[#3558D4]" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F0F1F3] text-[#20242D] border border-[#ECEEF1]/60">
+              <Compass className="w-3 h-3 text-[#20242D]" />
               Causal Graph &amp; Blast Radius
             </span>
-            <span className="text-xs text-[#6B7280]">|</span>
-            <span className="text-xs text-[#6B7280]">Empirical Dependency Intelligence</span>
+            <span className="text-xs text-[#747B87]">|</span>
+            <span className="text-xs text-[#747B87]">Empirical Dependency Intelligence</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#111827]">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#191C24]">
             Causal Graph &amp; Blast Radius
           </h1>
-          <p className="text-sm text-[#6B7280] mt-1 max-w-2xl leading-relaxed">
+          <p className="text-sm text-[#747B87] mt-1 max-w-2xl leading-relaxed">
             Persistent directed graph connecting source code defects, concurrency windows, database pool starvation, and customer financial risk.
           </p>
         </div>
@@ -304,7 +304,7 @@ export default function InvestigationPage() {
             ))}
           </div>
 
-          <p className="text-xs text-[#111827] bg-white p-3 rounded-xl border border-rose-200/60 leading-relaxed">
+          <p className="text-xs text-[#191C24] bg-white p-3 rounded-xl border border-rose-200/60 leading-relaxed">
             <strong className="text-[#C74747]">Causal Explanation:</strong> Git commit <code>a8f9c21b</code> removed thread synchronization. Injected client retry triggers parallel execution inside the synthetic payment gateway, debited customer orders twice, strictly violating invariant <code>INV-PAY-001</code>.
           </p>
         </div>
@@ -316,9 +316,9 @@ export default function InvestigationPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Graph Canvas Column (8 cols) */}
         <div className="lg:col-span-8 space-y-4">
-          <div className="bg-white rounded-2xl border border-[#E5E7EB] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-card">
+          <div className="bg-white rounded-2xl border border-[#ECEEF1] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-card">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-[#111827]">Release Variant:</span>
+              <span className="text-xs font-semibold text-[#191C24]">Release Variant:</span>
               <SegmentedTabs
                 size="sm"
                 options={[
@@ -331,7 +331,7 @@ export default function InvestigationPage() {
               />
             </div>
 
-            <div className="text-xs text-[#6B7280] flex items-center gap-2">
+            <div className="text-xs text-[#747B87] flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#168568]" />
               <span>Click any node to inspect evidence</span>
             </div>
@@ -352,9 +352,9 @@ export default function InvestigationPage() {
         <div className="lg:col-span-4 space-y-4">
           <Card className="h-full flex flex-col justify-between">
             <div>
-              <CardHeader className="border-b border-[#E5E7EB]/80 pb-4">
+              <CardHeader className="border-b border-[#ECEEF1]/80 pb-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-[#6B7280] uppercase tracking-wider">
+                  <span className="text-xs font-mono font-bold text-[#747B87] uppercase tracking-wider">
                     Contextual Inspector
                   </span>
                   {selectedNode && (
@@ -377,22 +377,22 @@ export default function InvestigationPage() {
                 {selectedNode ? (
                   <>
                     <div>
-                      <span className="text-[#6B7280] font-semibold block mb-1">Description:</span>
-                      <p className="text-[#111827] leading-relaxed bg-[#FAF9F6] p-3 rounded-xl border border-[#E5E7EB]/70">
+                      <span className="text-[#747B87] font-semibold block mb-1">Description:</span>
+                      <p className="text-[#191C24] leading-relaxed bg-[#F8F9FB] p-3 rounded-xl border border-[#ECEEF1]/70">
                         {selectedNode.description || "No extended description provided."}
                       </p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="p-2.5 rounded-xl bg-[#FAF9F6] border border-[#E5E7EB]/70">
-                        <span className="text-[#6B7280] block text-[10px] uppercase font-bold">Provenance Type</span>
-                        <span className="font-semibold text-[#111827] block mt-0.5">
+                      <div className="p-2.5 rounded-xl bg-[#F8F9FB] border border-[#ECEEF1]/70">
+                        <span className="text-[#747B87] block text-[10px] uppercase font-bold">Provenance Type</span>
+                        <span className="font-semibold text-[#191C24] block mt-0.5">
                           {selectedNode.provenance_type.replace(/_/g, " ")}
                         </span>
                       </div>
-                      <div className="p-2.5 rounded-xl bg-[#FAF9F6] border border-[#E5E7EB]/70">
-                        <span className="text-[#6B7280] block text-[10px] uppercase font-bold">Provenance Ref</span>
-                        <span className="font-mono font-semibold text-[#111827] block mt-0.5 truncate">
+                      <div className="p-2.5 rounded-xl bg-[#F8F9FB] border border-[#ECEEF1]/70">
+                        <span className="text-[#747B87] block text-[10px] uppercase font-bold">Provenance Ref</span>
+                        <span className="font-mono font-semibold text-[#191C24] block mt-0.5 truncate">
                           {selectedNode.provenance_id || "N/A"}
                         </span>
                       </div>
@@ -400,7 +400,7 @@ export default function InvestigationPage() {
 
                     {Boolean(selectedNode.metadata_json?.raw_log_excerpt) && (
                       <div>
-                        <span className="text-[#6B7280] font-semibold block mb-1">Empirical Log Evidence:</span>
+                        <span className="text-[#747B87] font-semibold block mb-1">Empirical Log Evidence:</span>
                         <pre className="p-3 bg-slate-900 text-slate-100 rounded-xl font-mono text-[10px] overflow-x-auto leading-relaxed">
                           {String(selectedNode.metadata_json.raw_log_excerpt)}
                         </pre>
@@ -408,10 +408,10 @@ export default function InvestigationPage() {
                     )}
                   </>
                 ) : (
-                  <div className="py-12 text-center text-[#6B7280] space-y-3">
-                    <Compass className="w-10 h-10 text-[#3558D4]/40 mx-auto" />
+                  <div className="py-12 text-center text-[#747B87] space-y-3">
+                    <Compass className="w-10 h-10 text-[#20242D]/40 mx-auto" />
                     <p className="max-w-xs mx-auto">
-                      Click on any node in the canvas or use the <strong className="text-[#111827]">Trace Duplicate Debit Causal Path</strong> button to step through the causal sequence.
+                      Click on any node in the canvas or use the <strong className="text-[#191C24]">Trace Duplicate Debit Causal Path</strong> button to step through the causal sequence.
                     </p>
                   </div>
                 )}
@@ -419,14 +419,14 @@ export default function InvestigationPage() {
             </div>
 
             {selectedNode && (
-              <div className="p-4 border-t border-[#E5E7EB] bg-[#FAF9F6] rounded-b-2xl flex flex-col gap-2">
+              <div className="p-4 border-t border-[#ECEEF1] bg-[#F8F9FB] rounded-b-2xl flex flex-col gap-2">
                 <Link href="/remediation" className="w-full block">
                   <Button variant="primary" size="sm" icon={<Wrench className="w-3.5 h-3.5" />} className="w-full justify-center">
                     Proceed to Remediation Studio
                   </Button>
                 </Link>
                 <Link href="/time-machine" className="w-full block">
-                  <Button variant="outline" size="sm" icon={<Clock className="w-3.5 h-3.5" />} className="w-full justify-center text-[#6B7280] hover:text-[#111827]">
+                  <Button variant="outline" size="sm" icon={<Clock className="w-3.5 h-3.5" />} className="w-full justify-center text-[#747B87] hover:text-[#191C24]">
                     Inspect Consequence in Time Machine
                   </Button>
                 </Link>
@@ -440,13 +440,13 @@ export default function InvestigationPage() {
           4. QUANTIFIED BLAST RADIUS BREAKDOWN TABLE
           ========================================================================= */}
       {blastRadius && (
-        <div className="bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden shadow-card">
-          <div className="p-6 border-b border-[#E5E7EB] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-white rounded-2xl border border-[#ECEEF1] overflow-hidden shadow-card">
+          <div className="p-6 border-b border-[#ECEEF1] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-base font-bold text-[#111827]">
+              <h3 className="text-base font-bold text-[#191C24]">
                 Empirical Blast Radius Breakdown
               </h3>
-              <p className="text-xs text-[#6B7280] mt-0.5">
+              <p className="text-xs text-[#747B87] mt-0.5">
                 Downstream services impacted by the concurrency defect in services/payment_worker/processor.py
               </p>
             </div>
@@ -457,7 +457,7 @@ export default function InvestigationPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#FAF9F6] text-[#6B7280] font-medium border-b border-[#E5E7EB]">
+              <thead className="bg-[#F8F9FB] text-[#747B87] font-medium border-b border-[#ECEEF1]">
                 <tr>
                   <th className="px-6 py-3">Impacted Service</th>
                   <th className="px-5 py-3">Cascading Failure Mode</th>
@@ -466,18 +466,18 @@ export default function InvestigationPage() {
                   <th className="px-6 py-3">Remediated State</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E5E7EB]/60">
-                <tr className="hover:bg-[#FAF9F6]/50">
-                  <td className="px-6 py-3.5 font-bold font-mono text-[#111827]">
+              <tbody className="divide-y divide-[#ECEEF1]/60">
+                <tr className="hover:bg-[#F8F9FB]/50">
+                  <td className="px-6 py-3.5 font-bold font-mono text-[#191C24]">
                     payment-service
                   </td>
                   <td className="px-5 py-3.5 text-[#C74747] font-semibold">
                     INV-PAY-001 Double Debits (4 charges)
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-[#6B7280]">
+                  <td className="px-5 py-3.5 font-mono text-[#747B87]">
                     +40ms race gap
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-[#6B7280]">
+                  <td className="px-5 py-3.5 font-mono text-[#747B87]">
                     exp-vuln-001 (5 concurrent checkouts)
                   </td>
                   <td className="px-6 py-3.5 text-[#168568] font-bold">
@@ -485,17 +485,17 @@ export default function InvestigationPage() {
                   </td>
                 </tr>
 
-                <tr className="hover:bg-[#FAF9F6]/50">
-                  <td className="px-6 py-3.5 font-bold font-mono text-[#111827]">
+                <tr className="hover:bg-[#F8F9FB]/50">
+                  <td className="px-6 py-3.5 font-bold font-mono text-[#191C24]">
                     ledger-db (PostgreSQL 16)
                   </td>
                   <td className="px-5 py-3.5 text-[#D78A43] font-semibold">
                     Connection Pool Starvation (342 Waiters)
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-[#6B7280]">
+                  <td className="px-5 py-3.5 font-mono text-[#747B87]">
                     +1,600ms onset
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-[#6B7280]">
+                  <td className="px-5 py-3.5 font-mono text-[#747B87]">
                     evi-002 (Pool max size 100 exhausted)
                   </td>
                   <td className="px-6 py-3.5 text-[#168568] font-bold">
@@ -503,17 +503,17 @@ export default function InvestigationPage() {
                   </td>
                 </tr>
 
-                <tr className="hover:bg-[#FAF9F6]/50">
-                  <td className="px-6 py-3.5 font-bold font-mono text-[#111827]">
+                <tr className="hover:bg-[#F8F9FB]/50">
+                  <td className="px-6 py-3.5 font-bold font-mono text-[#191C24]">
                     checkout-worker
                   </td>
                   <td className="px-5 py-3.5 text-[#D78A43] font-semibold">
                     Retry Storm Cascade
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-[#6B7280]">
+                  <td className="px-5 py-3.5 font-mono text-[#747B87]">
                     +2,100ms onset
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-[#6B7280]">
+                  <td className="px-5 py-3.5 font-mono text-[#747B87]">
                     Unbounded Exponential Retries
                   </td>
                   <td className="px-6 py-3.5 text-[#168568] font-bold">

@@ -143,13 +143,13 @@ export default function RemediationPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-28 bg-white rounded-2xl border border-[#E5E7EB]" />
+        <div className="h-28 bg-white rounded-2xl border border-[#ECEEF1]" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-44 bg-white rounded-2xl border border-[#E5E7EB]" />
+            <div key={i} className="h-44 bg-white rounded-2xl border border-[#ECEEF1]" />
           ))}
         </div>
-        <div className="h-96 bg-white rounded-2xl border border-[#E5E7EB]" />
+        <div className="h-96 bg-white rounded-2xl border border-[#ECEEF1]" />
       </div>
     );
   }
@@ -166,17 +166,17 @@ export default function RemediationPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#EFF4FE] text-[#3558D4] border border-[#BFD5FB]/60">
-              <Wrench className="w-3 h-3 text-[#3558D4]" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F0F1F3] text-[#20242D] border border-[#ECEEF1]/60">
+              <Wrench className="w-3 h-3 text-[#20242D]" />
               Supervised Remediation Studio
             </span>
-            <span className="text-xs text-[#6B7280]">|</span>
-            <span className="text-xs text-[#6B7280] font-mono">rel-2026-001 (a8f9c21b4d08)</span>
+            <span className="text-xs text-[#747B87]">|</span>
+            <span className="text-xs text-[#747B87] font-mono">rel-2026-001 (a8f9c21b4d08)</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#111827]">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#191C24]">
             Remediation Studio &amp; Fix Verification
           </h1>
-          <p className="text-sm text-[#6B7280] mt-1 max-w-2xl leading-relaxed">
+          <p className="text-sm text-[#747B87] mt-1 max-w-2xl leading-relaxed">
             Deterministic invariant recovery. Automatically synthesizes atomic concurrency barriers, executes live sandboxed pytest verification, and enforces human gatekeeper sign-off.
           </p>
         </div>
@@ -201,9 +201,9 @@ export default function RemediationPage() {
       {/* =========================================================================
           2. WORKFLOW STEPPER CARD (Clean White Card)
           ========================================================================= */}
-      <div className="bg-white rounded-2xl border border-[#E5E7EB] p-6 shadow-card space-y-4">
-        <div className="flex items-center justify-between text-xs text-[#6B7280]">
-          <span className="font-semibold text-[#111827] uppercase tracking-wider text-[11px]">
+      <div className="bg-white rounded-2xl border border-[#ECEEF1] p-6 shadow-card space-y-4">
+        <div className="flex items-center justify-between text-xs text-[#747B87]">
+          <span className="font-semibold text-[#191C24] uppercase tracking-wider text-[11px]">
             Autonomous Remediation Pipeline Lifecycle
           </span>
           <span className="font-mono">
@@ -219,19 +219,19 @@ export default function RemediationPage() {
                 key={step.key}
                 className={`p-3 rounded-xl border text-xs transition-all ${
                   stepStatus === "current"
-                    ? "bg-[#EFF4FE] border-[#3558D4] text-[#3558D4] font-semibold shadow-xs"
+                    ? "bg-[#F0F1F3] border-[#20242D] text-[#20242D] font-semibold shadow-xs"
                     : stepStatus === "completed"
                     ? "bg-[#ECFDF5] border-[#A7F3D0] text-[#168568]"
                     : stepStatus === "rejected"
                     ? "bg-[#FEF2F2] border-[#FECACA] text-[#C74747]"
-                    : "bg-[#FAF9F6] border-[#E5E7EB]/70 text-[#6B7280]"
+                    : "bg-[#F8F9FB] border-[#ECEEF1]/70 text-[#747B87]"
                 }`}
               >
                 <div className="flex items-center justify-between font-mono text-[10px] font-bold uppercase mb-1">
                   <span>STEP 0{idx + 1}</span>
                   {stepStatus === "completed" && <Check className="w-3.5 h-3.5 text-[#168568]" />}
                   {stepStatus === "current" && (
-                    <span className="w-2 h-2 rounded-full bg-[#3558D4] animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-[#20242D] animate-pulse" />
                   )}
                   {stepStatus === "rejected" && <X className="w-3.5 h-3.5 text-[#C74747]" />}
                 </div>
@@ -313,9 +313,9 @@ export default function RemediationPage() {
       {/* =========================================================================
           4. MAIN WORKSPACE: UNIFIED DIFF VS SANDBOX PROOF VS PROVENANCE
           ========================================================================= */}
-      <div className="bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden shadow-card">
+      <div className="bg-white rounded-2xl border border-[#ECEEF1] overflow-hidden shadow-card">
         {/* Workspace Tab Header */}
-        <div className="p-6 border-b border-[#E5E7EB] flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="p-6 border-b border-[#ECEEF1] flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <SegmentedTabs
               options={[
@@ -352,9 +352,9 @@ export default function RemediationPage() {
         {/* Tab 1: GNU Unified Diff */}
         {activeTab === "diff" && (
           <div className="p-6 lg:p-8 space-y-4">
-            <div className="flex items-center justify-between text-xs text-[#6B7280] bg-[#FAF9F6] p-3 rounded-xl border border-[#E5E7EB]/80">
-              <span className="font-mono font-medium text-[#111827] flex items-center gap-2">
-                <FileCode className="w-4 h-4 text-[#3558D4]" />
+            <div className="flex items-center justify-between text-xs text-[#747B87] bg-[#F8F9FB] p-3 rounded-xl border border-[#ECEEF1]/80">
+              <span className="font-mono font-medium text-[#191C24] flex items-center gap-2">
+                <FileCode className="w-4 h-4 text-[#20242D]" />
                 services/payment_worker/processor.py
               </span>
               <span className="font-mono">Unified GNU Diff &bull; SHA-256 Fingerprint Validated</span>
@@ -387,12 +387,12 @@ export default function RemediationPage() {
         {/* Tab 2: Sandbox Execution Proof */}
         {activeTab === "sandbox" && (
           <div className="p-6 lg:p-8 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF9F6] p-4 rounded-xl border border-[#E5E7EB]/80 text-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F8F9FB] p-4 rounded-xl border border-[#ECEEF1]/80 text-xs">
               <div>
-                <span className="font-bold text-[#111827] block">
+                <span className="font-bold text-[#191C24] block">
                   Isolated Worktree Sandbox Runner
                 </span>
-                <p className="text-[#6B7280] mt-0.5">
+                <p className="text-[#747B87] mt-0.5">
                   Executes real pytest in an ephemeral environment against unpatched vs patched code
                 </p>
               </div>
@@ -457,22 +457,22 @@ INVARIANT PRESERVED: Order ord_concurrent_99 settled exactly 1 charge.
         {/* Tab 3: Agent Tool Provenance */}
         {activeTab === "provenance" && (
           <div className="p-6 lg:p-8 space-y-4">
-            <h4 className="text-sm font-bold text-[#111827]">
+            <h4 className="text-sm font-bold text-[#191C24]">
               Tool Invocation &amp; Remediation Audit Trace
             </h4>
             <div className="space-y-3">
               {activeWorkflow?.tool_execution_records?.map((rec: any, idx: number) => (
-                <div key={idx} className="p-4 rounded-xl border border-[#E5E7EB] bg-[#FAF9F6] text-xs space-y-1">
+                <div key={idx} className="p-4 rounded-xl border border-[#ECEEF1] bg-[#F8F9FB] text-xs space-y-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-[#3558D4] font-mono">
+                    <span className="font-semibold text-[#20242D] font-mono">
                       Step 0{rec.step || idx + 1}: {rec.tool}
                     </span>
-                    <span className="font-mono text-[10px] text-[#6B7280]">
+                    <span className="font-mono text-[10px] text-[#747B87]">
                       {rec.timestamp ? new Date(rec.timestamp).toLocaleTimeString() : "Recorded"}
                     </span>
                   </div>
-                  <p className="font-semibold text-[#111827]">{rec.action}</p>
-                  <p className="text-[#6B7280] leading-relaxed">{rec.details}</p>
+                  <p className="font-semibold text-[#191C24]">{rec.action}</p>
+                  <p className="text-[#747B87] leading-relaxed">{rec.details}</p>
                 </div>
               ))}
             </div>
@@ -483,14 +483,14 @@ INVARIANT PRESERVED: Order ord_concurrent_99 settled exactly 1 charge.
       {/* =========================================================================
           5. HUMAN GATEKEEPER SIGN-OFF & APPROVAL FORM
           ========================================================================= */}
-      <div className="bg-white rounded-2xl border border-[#E5E7EB] p-6 lg:p-8 shadow-card space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E5E7EB]">
+      <div className="bg-white rounded-2xl border border-[#ECEEF1] p-6 lg:p-8 shadow-card space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#ECEEF1]">
           <div>
-            <h3 className="text-base font-bold text-[#111827] flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-[#3558D4]" />
+            <h3 className="text-base font-bold text-[#191C24] flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-[#20242D]" />
               Supervised Human Gatekeeper Sign-off
             </h3>
-            <p className="text-xs text-[#6B7280] mt-0.5">
+            <p className="text-xs text-[#747B87] mt-0.5">
               Production integration gate. Mandates explicit human engineer sign-off backed by reproducible sandbox evidence.
             </p>
           </div>
@@ -519,39 +519,39 @@ INVARIANT PRESERVED: Order ord_concurrent_99 settled exactly 1 charge.
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div>
-                <label className="block font-semibold text-[#111827] mb-1">
+                <label className="block font-semibold text-[#191C24] mb-1">
                   Lead Engineer Name
                 </label>
                 <input
                   type="text"
                   value={approverName}
                   onChange={(e) => setApproverName(e.target.value)}
-                  className="w-full bg-[#FAF9F6] border border-[#E5E7EB] rounded-xl px-3.5 py-2 text-xs focus:bg-white focus:outline-none focus:border-[#3558D4]"
+                  className="w-full bg-[#F8F9FB] border border-[#ECEEF1] rounded-xl px-3.5 py-2 text-xs focus:bg-white focus:outline-none focus:border-[#20242D]"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-[#111827] mb-1">
+                <label className="block font-semibold text-[#191C24] mb-1">
                   Official Email
                 </label>
                 <input
                   type="email"
                   value={approverEmail}
                   onChange={(e) => setApproverEmail(e.target.value)}
-                  className="w-full bg-[#FAF9F6] border border-[#E5E7EB] rounded-xl px-3.5 py-2 text-xs focus:bg-white focus:outline-none focus:border-[#3558D4]"
+                  className="w-full bg-[#F8F9FB] border border-[#ECEEF1] rounded-xl px-3.5 py-2 text-xs focus:bg-white focus:outline-none focus:border-[#20242D]"
                 />
               </div>
             </div>
 
             <div className="text-xs">
-              <label className="block font-semibold text-[#111827] mb-1">
+              <label className="block font-semibold text-[#191C24] mb-1">
                 Approval Sign-off Rationale
               </label>
               <textarea
                 rows={2}
                 value={approvalNote}
                 onChange={(e) => setApprovalNote(e.target.value)}
-                className="w-full bg-[#FAF9F6] border border-[#E5E7EB] rounded-xl p-3 text-xs focus:bg-white focus:outline-none focus:border-[#3558D4]"
+                className="w-full bg-[#F8F9FB] border border-[#ECEEF1] rounded-xl p-3 text-xs focus:bg-white focus:outline-none focus:border-[#20242D]"
               />
             </div>
 

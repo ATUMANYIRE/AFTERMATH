@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased min-h-screen bg-[#F7F8FA] text-[#111827]">
+      <body className="antialiased min-h-screen bg-[#F8F9FB] text-[#191C24]">
         <Providers>
           <NavigationShell>{children}</NavigationShell>
         </Providers>

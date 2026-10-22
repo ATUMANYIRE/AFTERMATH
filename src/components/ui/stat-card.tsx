@@ -31,44 +31,44 @@ export function StatCard({
   className = "",
 }: StatCardProps) {
   const tagBg = {
-    default: "bg-[#F3F4F6] text-[#4B5563]",
-    success: "bg-[#ECFDF5] text-[#168568] border border-[#A7F3D0]/60",
-    warning: "bg-[#FFFBEB] text-[#D78A43] border border-[#FDE68A]/60",
-    error: "bg-[#FEF2F2] text-[#C74747] border border-[#FECACA]/60",
-    accent: "bg-[#FFF7ED] text-[#EA580C] border border-[#FED7AA]/60",
+    default: "bg-[#F0F1F3] text-[#747B87]",
+    success: "bg-[#F0FDF4] text-[#22C55E]",
+    warning: "bg-[#FFFBEB] text-[#D97706]",
+    error: "bg-[#F0F1F3] text-[#747B87]",
+    accent: "bg-[#FFF5EC] text-[#FF6A13]",
   }[tagVariant];
 
   return (
     <div
-      className={`bg-white rounded-2xl border border-[#E5E7EB] p-6 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between ${className}`}
+      className={`bg-white rounded-2xl border border-[#ECEEF1] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.03)] transition-all flex flex-col justify-between ${className}`}
     >
       <div>
         {tag && (
-          <div className="mb-4">
+          <div className="mb-3">
             <span
-              className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${tagBg}`}
+              className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-medium ${tagBg}`}
             >
               {tag}
             </span>
           </div>
         )}
-        <h4 className="text-sm font-medium text-[#6B7280] tracking-normal mb-1.5">
+        <h4 className="text-[13px] font-normal text-[#747B87] tracking-normal mb-1">
           {title}
         </h4>
-        <div className="flex items-baseline gap-2 mb-2">
-          <span className="text-3xl lg:text-4xl font-bold text-[#111827] tracking-tight">
+        <div className="flex items-baseline gap-2 mb-1.5">
+          <span className="text-[32px] lg:text-[36px] font-semibold text-[#191C24] tracking-tight leading-none">
             {value}
           </span>
         </div>
         {delta && (
-          <div className="flex items-center gap-1.5 text-xs font-medium">
+          <div className="flex items-center gap-1.5 text-xs font-normal">
             <span
               className={
                 delta.isRisk
-                  ? "text-[#C74747]"
+                  ? "text-[#FF6A13]"
                   : delta.isPositive
-                  ? "text-[#168568]"
-                  : "text-[#6B7280]"
+                  ? "text-[#22C55E]"
+                  : "text-[#747B87]"
               }
             >
               {delta.value}
@@ -76,20 +76,20 @@ export function StatCard({
           </div>
         )}
         {description && (
-          <p className="text-xs text-[#6B7280] leading-relaxed mt-1">
+          <p className="text-xs text-[#747B87] leading-relaxed mt-1">
             {description}
           </p>
         )}
       </div>
 
       {subStats && subStats.length > 0 && (
-        <div className="mt-5 pt-4 border-t border-[#E5E7EB] grid grid-cols-2 gap-4">
+        <div className="mt-5 pt-3.5 border-t border-[#ECEEF1] grid grid-cols-2 gap-4">
           {subStats.map((sub, i) => (
             <div key={i}>
-              <span className="block text-[11px] font-medium text-[#6B7280] uppercase tracking-wider">
+              <span className="block text-[11px] font-normal text-[#747B87]">
                 {sub.label}
               </span>
-              <span className="block text-sm font-semibold text-[#111827] mt-0.5">
+              <span className="block text-sm font-semibold text-[#191C24] mt-0.5">
                 {sub.value}
               </span>
             </div>

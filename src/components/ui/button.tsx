@@ -17,27 +17,27 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#F97316]/20 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]";
+    "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#20242D]/10 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]";
 
   const variantStyles = {
     primary:
-      "bg-[#111827] hover:bg-[#1F2937] text-white shadow-sm border border-[#111827]",
+      "bg-[#20242D] hover:bg-[#2A303C] text-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-[#20242D]",
     brand:
-      "bg-[#F97316] hover:bg-[#EA580C] text-white shadow-sm border border-[#F97316]",
+      "bg-[#FF6A13] hover:bg-[#E55907] text-white shadow-[0_1px_2px_rgba(255,106,19,0.2)] border border-[#FF6A13]",
     secondary:
-      "bg-white hover:bg-[#F9FAFB] text-[#111827] border border-[#E5E7EB] shadow-card",
+      "bg-white hover:bg-[#F9FAFB] text-[#191C24] border border-[#ECEEF1] shadow-[0_1px_2px_rgba(0,0,0,0.02)]",
     outline:
-      "bg-transparent hover:bg-slate-100/70 text-[#111827] border border-[#E5E7EB]",
+      "bg-transparent hover:bg-slate-100/70 text-[#191C24] border border-[#ECEEF1]",
     ghost:
-      "bg-transparent hover:bg-slate-100/80 text-[#6B7280] hover:text-[#111827]",
+      "bg-transparent hover:bg-black/[0.03] text-[#747B87] hover:text-[#191C24]",
     destructive:
-      "bg-[#C74747] hover:bg-[#A83838] text-white shadow-sm border border-[#C74747]",
+      "bg-rose-600 hover:bg-rose-700 text-white shadow-sm border border-rose-600",
   }[variant];
 
   const sizeStyles = {
     sm: "text-xs px-3 py-1.5 gap-1.5 h-8",
-    md: "text-sm px-4 py-2 gap-2 h-10",
-    lg: "text-base px-5 py-2.5 gap-2.5 h-12",
+    md: "text-xs px-3.5 py-2 gap-2 h-9",
+    lg: "text-sm px-4 py-2.5 gap-2 h-10",
   }[size];
 
   return (

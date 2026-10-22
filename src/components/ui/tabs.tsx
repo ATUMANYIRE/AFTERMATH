@@ -24,17 +24,17 @@ export function SegmentedTabs({
 }: SegmentedTabsProps) {
   const sizeStyles = {
     sm: "p-0.5 text-xs",
-    md: "p-1 text-sm",
+    md: "p-1 text-xs",
   }[size];
 
   const itemSizeStyles = {
     sm: "px-2.5 py-1 gap-1.5",
-    md: "px-3.5 py-1.5 gap-2",
+    md: "px-3 py-1.5 gap-2",
   }[size];
 
   return (
     <div
-      className={`inline-flex items-center bg-[#F3F4F6] rounded-xl border border-[#E5E7EB] ${sizeStyles} ${className}`}
+      className={`inline-flex items-center bg-[#F0F1F3] rounded-xl border border-[#ECEEF1] ${sizeStyles} ${className}`}
     >
       {options.map((option) => {
         const isActive = option.id === activeId;
@@ -45,8 +45,8 @@ export function SegmentedTabs({
             onClick={() => onChange(option.id)}
             className={`inline-flex items-center font-medium rounded-lg transition-all duration-150 ${itemSizeStyles} ${
               isActive
-                ? "bg-white text-[#111827] shadow-sm font-semibold"
-                : "text-[#6B7280] hover:text-[#111827] hover:bg-white/50"
+                ? "bg-white text-[#191C24] shadow-[0_1px_2px_rgba(0,0,0,0.03)] font-medium"
+                : "text-[#747B87] hover:text-[#191C24]"
             }`}
           >
             {option.icon && <span className="shrink-0">{option.icon}</span>}
@@ -55,8 +55,8 @@ export function SegmentedTabs({
               <span
                 className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${
                   isActive
-                    ? "bg-[#FFF7ED] text-[#EA580C]"
-                    : "bg-slate-200 text-[#6B7280]"
+                    ? "bg-[#FFF5EC] text-[#FF6A13]"
+                    : "bg-[#ECEEF1] text-[#747B87]"
                 }`}
               >
                 {option.badge}

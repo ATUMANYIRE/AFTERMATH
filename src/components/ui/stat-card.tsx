@@ -56,7 +56,15 @@ export function StatCard({
           {title}
         </h4>
         <div className="flex items-baseline gap-2 mb-1.5">
-          <span className="text-[32px] lg:text-[36px] font-semibold text-[#191C24] tracking-tight leading-none">
+          <span
+            className={`font-semibold text-[#191C24] tracking-tight leading-tight break-words ${
+              typeof value === "string" && value.length > 14
+                ? "text-[20px] lg:text-[22px]"
+                : typeof value === "string" && value.length > 8
+                ? "text-[24px] lg:text-[28px]"
+                : "text-[32px] lg:text-[36px]"
+            }`}
+          >
             {value}
           </span>
         </div>

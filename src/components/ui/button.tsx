@@ -2,7 +2,7 @@ import React from "react";
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive";
+  variant?: "primary" | "brand" | "secondary" | "outline" | "ghost" | "destructive";
   size?: "sm" | "md" | "lg";
   icon?: React.ReactNode;
 }
@@ -17,17 +17,19 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#3558D4]/20 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]";
+    "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#F97316]/20 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]";
 
   const variantStyles = {
     primary:
-      "bg-[#3558D4] hover:bg-[#2846B4] text-white shadow-sm border border-[#3558D4]",
+      "bg-[#111827] hover:bg-[#1F2937] text-white shadow-sm border border-[#111827]",
+    brand:
+      "bg-[#F97316] hover:bg-[#EA580C] text-white shadow-sm border border-[#F97316]",
     secondary:
-      "bg-white hover:bg-slate-50 text-[#172033] border border-[#DCE2EB] shadow-card",
+      "bg-white hover:bg-[#F9FAFB] text-[#111827] border border-[#E5E7EB] shadow-card",
     outline:
-      "bg-transparent hover:bg-slate-100/70 text-[#172033] border border-[#DCE2EB]",
+      "bg-transparent hover:bg-slate-100/70 text-[#111827] border border-[#E5E7EB]",
     ghost:
-      "bg-transparent hover:bg-slate-100/80 text-[#667085] hover:text-[#172033]",
+      "bg-transparent hover:bg-slate-100/80 text-[#6B7280] hover:text-[#111827]",
     destructive:
       "bg-[#C74747] hover:bg-[#A83838] text-white shadow-sm border border-[#C74747]",
   }[variant];

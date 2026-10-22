@@ -153,15 +153,15 @@ export default function TimeMachinePage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-28 bg-white rounded-2xl border border-[#DCE2EB]" />
+        <div className="h-28 bg-white rounded-2xl border border-[#E5E7EB]" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-44 bg-white rounded-2xl border border-[#DCE2EB]" />
+            <div key={i} className="h-44 bg-white rounded-2xl border border-[#E5E7EB]" />
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="h-96 bg-white rounded-2xl border border-[#DCE2EB]" />
-          <div className="h-96 bg-white rounded-2xl border border-[#DCE2EB]" />
+          <div className="h-96 bg-white rounded-2xl border border-[#E5E7EB]" />
+          <div className="h-96 bg-white rounded-2xl border border-[#E5E7EB]" />
         </div>
       </div>
     );
@@ -173,10 +173,10 @@ export default function TimeMachinePage() {
         <div className="w-12 h-12 rounded-full bg-rose-50 text-[#C74747] flex items-center justify-center mx-auto mb-4">
           <AlertTriangle className="w-6 h-6" />
         </div>
-        <h3 className="text-lg font-semibold text-[#172033] mb-1">
+        <h3 className="text-lg font-semibold text-[#111827] mb-1">
           Comparison Data Not Found
         </h3>
-        <p className="text-sm text-[#667085] mb-6">
+        <p className="text-sm text-[#6B7280] mb-6">
           Unable to load experiment runs for release &apos;{selectedRelease}&apos;.
         </p>
         <Button onClick={() => refetch()} variant="primary" icon={<RefreshCw className="w-4 h-4" />}>
@@ -221,13 +221,13 @@ export default function TimeMachinePage() {
               <Clock className="w-3 h-3 text-[#3558D4]" />
               Consequence Laboratory
             </span>
-            <span className="text-xs text-[#667085]">|</span>
-            <span className="text-xs text-[#667085]">Deterministic Empirical Runner</span>
+            <span className="text-xs text-[#6B7280]">|</span>
+            <span className="text-xs text-[#6B7280]">Deterministic Empirical Runner</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#172033]">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#111827]">
             Release Time Machine
           </h1>
-          <p className="text-sm text-[#667085] mt-1 max-w-2xl leading-relaxed">
+          <p className="text-sm text-[#6B7280] mt-1 max-w-2xl leading-relaxed">
             Execute real concurrent payment workloads against unpatched vs repaired release variants. Scrub synchronized execution timelines and inspect live customer ledger debits.
           </p>
         </div>
@@ -255,14 +255,14 @@ export default function TimeMachinePage() {
       {/* =========================================================================
           2. SCENARIO SELECTOR & TUNING PANEL (Clean White Card)
           ========================================================================= */}
-      <div className="bg-white rounded-2xl border border-[#DCE2EB] p-6 lg:p-7 shadow-card space-y-6">
+      <div className="bg-white rounded-2xl border border-[#E5E7EB] p-6 lg:p-7 shadow-card space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h3 className="text-base font-bold text-[#172033] flex items-center gap-2">
+            <h3 className="text-base font-bold text-[#111827] flex items-center gap-2">
               <SlidersHorizontal className="w-4 h-4 text-[#3558D4]" />
               Consequence Fault Injection Scenario
             </h3>
-            <p className="text-xs text-[#667085] mt-0.5">
+            <p className="text-xs text-[#6B7280] mt-0.5">
               Select an adversarial vector to evaluate release concurrency boundaries
             </p>
           </div>
@@ -278,7 +278,7 @@ export default function TimeMachinePage() {
                   className={`text-xs px-3.5 py-1.5 rounded-xl font-medium transition-all ${
                     isSelected
                       ? "bg-[#3558D4] text-white shadow-sm font-semibold"
-                      : "bg-[#F1F5F9] text-[#667085] hover:text-[#172033] hover:bg-slate-200/80"
+                      : "bg-[#F1F5F9] text-[#6B7280] hover:text-[#111827] hover:bg-slate-200/80"
                   }`}
                 >
                   {sc.shortName}
@@ -289,20 +289,20 @@ export default function TimeMachinePage() {
         </div>
 
         {/* Active Scenario Details Banner */}
-        <div className="bg-[#FAF9F6] rounded-xl p-4 border border-[#DCE2EB]/80 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">
+        <div className="bg-[#FAF9F6] rounded-xl p-4 border border-[#E5E7EB]/80 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">
           <div className="space-y-1">
-            <span className="font-semibold text-[#172033] block">
+            <span className="font-semibold text-[#111827] block">
               {currentScenario.name}
             </span>
-            <p className="text-[#667085] leading-relaxed">
+            <p className="text-[#6B7280] leading-relaxed">
               {currentScenario.description}
             </p>
           </div>
 
           {/* Quick Param Sliders */}
-          <div className="flex items-center gap-6 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#DCE2EB]/60">
+          <div className="flex items-center gap-6 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#E5E7EB]/60">
             <div>
-              <span className="block text-[11px] text-[#667085] font-medium uppercase tracking-wider mb-1">
+              <span className="block text-[11px] text-[#6B7280] font-medium uppercase tracking-wider mb-1">
                 Concurrency ({concurrency} workers)
               </span>
               <input
@@ -316,7 +316,7 @@ export default function TimeMachinePage() {
             </div>
 
             <div>
-              <span className="block text-[11px] text-[#667085] font-medium uppercase tracking-wider mb-1">
+              <span className="block text-[11px] text-[#6B7280] font-medium uppercase tracking-wider mb-1">
                 Retry Bursts ({retryCount}x)
               </span>
               <input
@@ -401,9 +401,9 @@ export default function TimeMachinePage() {
       {/* =========================================================================
           4. COMPARISON WORKSPACE: TIMELINES VS CUSTOMER LEDGER
           ========================================================================= */}
-      <div className="bg-white rounded-2xl border border-[#DCE2EB] overflow-hidden shadow-card">
+      <div className="bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden shadow-card">
         {/* Workspace Toolbar & Tabs */}
-        <div className="p-6 border-b border-[#DCE2EB] flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="p-6 border-b border-[#E5E7EB] flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <SegmentedTabs
               options={[
@@ -417,15 +417,15 @@ export default function TimeMachinePage() {
 
           {activeTab === "timeline" && (
             <div className="flex items-center gap-3 text-xs">
-              <span className="text-[#667085]">Filter Level:</span>
-              <div className="inline-flex rounded-lg bg-[#F1F5F9] p-0.5 border border-[#DCE2EB]">
+              <span className="text-[#6B7280]">Filter Level:</span>
+              <div className="inline-flex rounded-lg bg-[#F1F5F9] p-0.5 border border-[#E5E7EB]">
                 {["all", "anomalies", "success"].map((lvl) => (
                   <button
                     key={lvl}
                     type="button"
                     onClick={() => setFilterLevel(lvl)}
                     className={`px-2.5 py-1 rounded-md capitalize font-medium transition-all ${
-                      filterLevel === lvl ? "bg-white text-[#172033] shadow-xs" : "text-[#667085] hover:text-[#172033]"
+                      filterLevel === lvl ? "bg-white text-[#111827] shadow-xs" : "text-[#6B7280] hover:text-[#111827]"
                     }`}
                   >
                     {lvl}
@@ -440,10 +440,10 @@ export default function TimeMachinePage() {
         {activeTab === "timeline" && (
           <div className="p-6 lg:p-8 space-y-6">
             {/* Scrubber Bar */}
-            <div className="bg-[#FAF9F6] rounded-xl p-4 border border-[#DCE2EB]/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2 text-[#667085]">
+            <div className="bg-[#FAF9F6] rounded-xl p-4 border border-[#E5E7EB]/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2 text-[#6B7280]">
                 <Activity className="w-4 h-4 text-[#3558D4]" />
-                <span className="font-semibold text-[#172033]">Timeline Scrubber:</span>
+                <span className="font-semibold text-[#111827]">Timeline Scrubber:</span>
                 <span>{scrubTimeMs !== null ? `${scrubTimeMs}ms` : "Live Full Timeline (End)"}</span>
               </div>
 
@@ -460,7 +460,7 @@ export default function TimeMachinePage() {
                   <button
                     type="button"
                     onClick={() => setScrubTimeMs(null)}
-                    className="p-1 rounded text-[#667085] hover:text-[#172033] hover:bg-slate-200/80 transition-colors"
+                    className="p-1 rounded text-[#6B7280] hover:text-[#111827] hover:bg-slate-200/80 transition-colors"
                     title="Reset Scrubber"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -477,12 +477,12 @@ export default function TimeMachinePage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#C74747]" />
-                      <h4 className="font-bold text-[#172033] text-sm">
+                      <h4 className="font-bold text-[#111827] text-sm">
                         Vulnerable Release
                       </h4>
                       <Badge variant="error">Unpatched</Badge>
                     </div>
-                    <span className="text-xs text-[#667085] font-mono mt-0.5 block">
+                    <span className="text-xs text-[#6B7280] font-mono mt-0.5 block">
                       {comparison.version_tag} ({vuln.release_id.substring(0, 12)})
                     </span>
                   </div>
@@ -491,7 +491,7 @@ export default function TimeMachinePage() {
                     <span className="text-xs font-mono font-bold text-[#C74747] block">
                       {vuln.ledger_summary?.orders_violating_invariant ?? 4} Double Debits
                     </span>
-                    <span className="text-[11px] text-[#667085]">
+                    <span className="text-[11px] text-[#6B7280]">
                       ${(vuln.ledger_summary?.financial_exposure_usd ?? 1500.0).toFixed(2)} Exposure
                     </span>
                   </div>
@@ -507,10 +507,10 @@ export default function TimeMachinePage() {
                         className={`p-3 rounded-lg border text-xs transition-all ${
                           isAnomaly
                             ? "bg-rose-50/90 border-rose-200 text-[#C74747] font-medium"
-                            : "bg-white border-[#DCE2EB] text-[#172033]"
+                            : "bg-white border-[#E5E7EB] text-[#111827]"
                         }`}
                       >
-                        <div className="flex items-center justify-between font-mono text-[10px] text-[#667085] mb-1">
+                        <div className="flex items-center justify-between font-mono text-[10px] text-[#6B7280] mb-1">
                           <span>+{ev.timestamp_offset_ms}ms &bull; {ev.service_name}</span>
                           <span className="uppercase font-semibold">{ev.event_type}</span>
                         </div>
@@ -519,7 +519,7 @@ export default function TimeMachinePage() {
                     );
                   })}
                   {filterEvents(vuln.events).length === 0 && (
-                    <p className="text-xs text-[#667085] text-center py-8">
+                    <p className="text-xs text-[#6B7280] text-center py-8">
                       No events matching scrubber filter.
                     </p>
                   )}
@@ -532,12 +532,12 @@ export default function TimeMachinePage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#168568]" />
-                      <h4 className="font-bold text-[#172033] text-sm">
+                      <h4 className="font-bold text-[#111827] text-sm">
                         Repaired Release
                       </h4>
                       <Badge variant="success">Verified Fix</Badge>
                     </div>
-                    <span className="text-xs text-[#667085] font-mono mt-0.5 block">
+                    <span className="text-xs text-[#6B7280] font-mono mt-0.5 block">
                       {comparison.version_tag} ({rep.release_id.substring(0, 12)})
                     </span>
                   </div>
@@ -546,7 +546,7 @@ export default function TimeMachinePage() {
                     <span className="text-xs font-mono font-bold text-[#168568] block">
                       {rep.ledger_summary?.orders_violating_invariant ?? 0} Double Debits (Preserved)
                     </span>
-                    <span className="text-[11px] text-[#667085]">
+                    <span className="text-[11px] text-[#6B7280]">
                       ${(rep.ledger_summary?.financial_exposure_usd ?? 0.0).toFixed(2)} Risk Exposure
                     </span>
                   </div>
@@ -562,10 +562,10 @@ export default function TimeMachinePage() {
                         className={`p-3 rounded-lg border text-xs transition-all ${
                           isSuccess
                             ? "bg-emerald-50/90 border-emerald-200 text-[#168568] font-medium"
-                            : "bg-white border-[#DCE2EB] text-[#172033]"
+                            : "bg-white border-[#E5E7EB] text-[#111827]"
                         }`}
                       >
-                        <div className="flex items-center justify-between font-mono text-[10px] text-[#667085] mb-1">
+                        <div className="flex items-center justify-between font-mono text-[10px] text-[#6B7280] mb-1">
                           <span>+{ev.timestamp_offset_ms}ms &bull; {ev.service_name}</span>
                           <span className="uppercase font-semibold">{ev.event_type}</span>
                         </div>
@@ -574,7 +574,7 @@ export default function TimeMachinePage() {
                     );
                   })}
                   {filterEvents(rep.events).length === 0 && (
-                    <p className="text-xs text-[#667085] text-center py-8">
+                    <p className="text-xs text-[#6B7280] text-center py-8">
                       No events matching scrubber filter.
                     </p>
                   )}
@@ -588,10 +588,10 @@ export default function TimeMachinePage() {
         {activeTab === "ledger" && (
           <div className="p-6 lg:p-8 space-y-6">
             <div>
-              <h4 className="text-base font-bold text-[#172033]">
+              <h4 className="text-base font-bold text-[#111827]">
                 Customer Ledger Debit Records
               </h4>
-              <p className="text-xs text-[#667085] mt-0.5">
+              <p className="text-xs text-[#6B7280] mt-0.5">
                 Real transaction records persisted in the database proving the exactly-once settlement invariant
               </p>
             </div>
@@ -604,13 +604,13 @@ export default function TimeMachinePage() {
                     <XCircle className="w-3.5 h-3.5" />
                     Unpatched Ledger (Multiple Debits)
                   </span>
-                  <span className="text-[11px] font-mono text-[#667085]">
+                  <span className="text-[11px] font-mono text-[#6B7280]">
                     {vulnLedger?.length || 0} Records
                   </span>
                 </div>
                 <div className="overflow-x-auto max-h-80">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-[#FAF9F6] text-[#667085] border-b border-rose-100">
+                    <thead className="bg-[#FAF9F6] text-[#6B7280] border-b border-rose-100">
                       <tr>
                         <th className="px-3 py-2">Order ID</th>
                         <th className="px-3 py-2">Amount</th>
@@ -618,10 +618,10 @@ export default function TimeMachinePage() {
                         <th className="px-3 py-2">Duplicate?</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#DCE2EB]/60">
+                    <tbody className="divide-y divide-[#E5E7EB]/60">
                       {vulnLedger?.map((txn) => (
                         <tr key={txn.id} className={txn.is_duplicate ? "bg-rose-50/50" : ""}>
-                          <td className="px-3 py-2 font-mono font-medium text-[#172033]">
+                          <td className="px-3 py-2 font-mono font-medium text-[#111827]">
                             {txn.order_id}
                           </td>
                           <td className="px-3 py-2 font-mono">
@@ -634,7 +634,7 @@ export default function TimeMachinePage() {
                             {txn.is_duplicate ? (
                               <span className="font-bold text-[#C74747]">DOUBLE CHARGE</span>
                             ) : (
-                              <span className="text-[#667085]">Original</span>
+                              <span className="text-[#6B7280]">Original</span>
                             )}
                           </td>
                         </tr>
@@ -651,13 +651,13 @@ export default function TimeMachinePage() {
                     <CheckCircle className="w-3.5 h-3.5" />
                     Repaired Ledger (Exactly-Once Invariant)
                   </span>
-                  <span className="text-[11px] font-mono text-[#667085]">
+                  <span className="text-[11px] font-mono text-[#6B7280]">
                     {repLedger?.length || 0} Records
                   </span>
                 </div>
                 <div className="overflow-x-auto max-h-80">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-[#FAF9F6] text-[#667085] border-b border-emerald-100">
+                    <thead className="bg-[#FAF9F6] text-[#6B7280] border-b border-emerald-100">
                       <tr>
                         <th className="px-3 py-2">Order ID</th>
                         <th className="px-3 py-2">Amount</th>
@@ -665,10 +665,10 @@ export default function TimeMachinePage() {
                         <th className="px-3 py-2">Duplicate?</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#DCE2EB]/60">
+                    <tbody className="divide-y divide-[#E5E7EB]/60">
                       {repLedger?.map((txn) => (
                         <tr key={txn.id}>
-                          <td className="px-3 py-2 font-mono font-medium text-[#172033]">
+                          <td className="px-3 py-2 font-mono font-medium text-[#111827]">
                             {txn.order_id}
                           </td>
                           <td className="px-3 py-2 font-mono">
@@ -694,21 +694,21 @@ export default function TimeMachinePage() {
       {/* =========================================================================
           5. EMPIRICAL EVIDENCE & AUDIT FOOTER
           ========================================================================= */}
-      <div className="bg-white rounded-2xl border border-[#DCE2EB] p-6 shadow-card">
-        <h4 className="text-base font-bold text-[#172033] mb-4 flex items-center gap-2">
+      <div className="bg-white rounded-2xl border border-[#E5E7EB] p-6 shadow-card">
+        <h4 className="text-base font-bold text-[#111827] mb-4 flex items-center gap-2">
           <FileText className="w-4 h-4 text-[#3558D4]" />
           Empirical Artifact Citations
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {(comparison.vulnerable_experiment.evidences || []).map((ev) => (
-            <div key={ev.id} className="p-4 rounded-xl border border-[#DCE2EB] bg-[#FAF9F6] space-y-1.5 text-xs">
+            <div key={ev.id} className="p-4 rounded-xl border border-[#E5E7EB] bg-[#FAF9F6] space-y-1.5 text-xs">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-[#172033]">{ev.title}</span>
+                <span className="font-semibold text-[#111827]">{ev.title}</span>
                 <Badge variant={ev.severity === "high" ? "error" : "default"}>
                   {ev.category}
                 </Badge>
               </div>
-              <p className="text-[#667085]">{ev.summary}</p>
+              <p className="text-[#6B7280]">{ev.summary}</p>
               {ev.raw_log_excerpt && (
                 <pre className="font-mono text-[10px] bg-slate-900 text-slate-100 p-2.5 rounded-lg overflow-x-auto mt-2">
                   {ev.raw_log_excerpt}

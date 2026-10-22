@@ -45,13 +45,13 @@ function getNodeIcon(type: string) {
     case "observed_consequence":
       return <ShieldAlert className="w-3.5 h-3.5 text-[#C74747]" />;
     case "hypothesized_downstream_effect":
-      return <HelpCircle className="w-3.5 h-3.5 text-[#667085]" />;
+      return <HelpCircle className="w-3.5 h-3.5 text-[#6B7280]" />;
     case "remediation_candidate":
       return <ShieldCheck className="w-3.5 h-3.5 text-[#168568]" />;
     case "verification_evidence":
       return <FileCheck2 className="w-3.5 h-3.5 text-[#3558D4]" />;
     default:
-      return <Database className="w-3.5 h-3.5 text-[#667085]" />;
+      return <Database className="w-3.5 h-3.5 text-[#6B7280]" />;
   }
 }
 
@@ -64,14 +64,14 @@ export function CausalNodeCard({ data }: NodeProps) {
   const isWarning = node.severity === "warning";
   const isVerified = node.severity === "verified" || node.severity === "mitigated";
 
-  let borderStyle = "border-[#DCE2EB]";
+  let borderStyle = "border-[#E5E7EB]";
   let cardBg = "bg-white";
 
   if (isPathHighlighted) {
     borderStyle = "border-[#3558D4] ring-2 ring-[#3558D4]/25 shadow-md";
     cardBg = "bg-[#EFF4FE]/40";
   } else if (isSelected) {
-    borderStyle = "border-[#172033] ring-2 ring-[#172033]/20 shadow-md";
+    borderStyle = "border-[#111827] ring-2 ring-[#111827]/20 shadow-md";
   } else if (isCritical) {
     borderStyle = "border-rose-200";
     cardBg = "bg-rose-50/25";
@@ -89,7 +89,7 @@ export function CausalNodeCard({ data }: NodeProps) {
     ? "bg-amber-50 text-[#D78A43] border-amber-200"
     : isVerified
     ? "bg-emerald-50 text-[#168568] border-emerald-200"
-    : "bg-slate-100 text-[#667085] border-slate-200";
+    : "bg-slate-100 text-[#6B7280] border-slate-200";
 
   return (
     <div
@@ -98,12 +98,12 @@ export function CausalNodeCard({ data }: NodeProps) {
       <Handle
         type="target"
         position={Position.Left}
-        className="!w-2 !h-2 !bg-[#667085] !border-white"
+        className="!w-2 !h-2 !bg-[#6B7280] !border-white"
       />
 
       {/* Header: Node Type & Severity Badge */}
       <div className="flex items-center justify-between gap-1 mb-2">
-        <span className="flex items-center gap-1.5 text-[10px] font-mono uppercase font-bold text-[#667085]">
+        <span className="flex items-center gap-1.5 text-[10px] font-mono uppercase font-bold text-[#6B7280]">
           {getNodeIcon(node.node_type)}
           <span>{node.node_type.replace(/_/g, " ")}</span>
         </span>
@@ -115,22 +115,22 @@ export function CausalNodeCard({ data }: NodeProps) {
       </div>
 
       {/* Title */}
-      <h4 className="text-xs font-bold text-[#172033] leading-tight mb-1 line-clamp-2">
+      <h4 className="text-xs font-bold text-[#111827] leading-tight mb-1 line-clamp-2">
         {node.label}
       </h4>
 
       {/* Description */}
       {node.description && (
-        <p className="text-[11px] text-[#667085] leading-snug line-clamp-2 mb-2.5">
+        <p className="text-[11px] text-[#6B7280] leading-snug line-clamp-2 mb-2.5">
           {node.description}
         </p>
       )}
 
       {/* Provenance Footer */}
-      <div className="pt-2 border-t border-[#DCE2EB]/70 flex items-center justify-between text-[10px] font-mono text-[#667085]">
+      <div className="pt-2 border-t border-[#E5E7EB]/70 flex items-center justify-between text-[10px] font-mono text-[#6B7280]">
         <span>Prov: {node.provenance_type.replace(/_/g, " ")}</span>
         {node.provenance_id && (
-          <span className="text-[#172033] font-semibold truncate max-w-[100px]">
+          <span className="text-[#111827] font-semibold truncate max-w-[100px]">
             {node.provenance_id}
           </span>
         )}
@@ -139,7 +139,7 @@ export function CausalNodeCard({ data }: NodeProps) {
       <Handle
         type="source"
         position={Position.Right}
-        className="!w-2 !h-2 !bg-[#667085] !border-white"
+        className="!w-2 !h-2 !bg-[#6B7280] !border-white"
       />
     </div>
   );
@@ -192,7 +192,7 @@ export function CausalFlowGraph({
       const isObserved = e.classification === "OBSERVED";
       const isInferred = e.classification === "INFERRED";
 
-      let strokeColor = "#667085";
+      let strokeColor = "#6B7280";
       let strokeDasharray: string | undefined = undefined;
       let strokeWidth = 1.5;
 
@@ -203,13 +203,13 @@ export function CausalFlowGraph({
         strokeColor = "#168568";
         strokeWidth = 2;
       } else if (isObserved) {
-        strokeColor = "#172033";
+        strokeColor = "#111827";
         strokeWidth = 2;
       } else if (isInferred) {
         strokeColor = "#D78A43";
         strokeDasharray = "5 5";
       } else {
-        strokeColor = "#DCE2EB";
+        strokeColor = "#E5E7EB";
         strokeDasharray = "2 3";
       }
 
@@ -233,7 +233,7 @@ export function CausalFlowGraph({
         },
         label: e.relation_type,
         labelStyle: {
-          fill: isPathHighlighted ? "#3558D4" : "#667085",
+          fill: isPathHighlighted ? "#3558D4" : "#6B7280",
           fontSize: 9,
           fontWeight: 600,
           fontFamily: "monospace",
@@ -241,7 +241,7 @@ export function CausalFlowGraph({
         labelBgStyle: {
           fill: "#FFFFFF",
           fillOpacity: 0.95,
-          stroke: "#DCE2EB",
+          stroke: "#E5E7EB",
           strokeWidth: 0.5,
         },
       };
@@ -249,12 +249,12 @@ export function CausalFlowGraph({
   }, [edges, highlightedPathEdgeIds]);
 
   return (
-    <div className="w-full h-[600px] bg-[#FAF9F6] rounded-2xl border border-[#DCE2EB] relative overflow-hidden shadow-card">
+    <div className="w-full h-[600px] bg-[#FAF9F6] rounded-2xl border border-[#E5E7EB] relative overflow-hidden shadow-card">
       {/* Canvas Epistemic Legend Bar */}
-      <div className="absolute top-4 left-4 z-10 bg-white/95 backdrop-blur-sm border border-[#DCE2EB] px-3.5 py-2 rounded-xl shadow-card flex items-center gap-4 text-[11px] font-medium text-[#667085]">
-        <span className="font-semibold text-[#172033]">Causal Classification:</span>
+      <div className="absolute top-4 left-4 z-10 bg-white/95 backdrop-blur-sm border border-[#E5E7EB] px-3.5 py-2 rounded-xl shadow-card flex items-center gap-4 text-[11px] font-medium text-[#6B7280]">
+        <span className="font-semibold text-[#111827]">Causal Classification:</span>
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-0.5 bg-[#172033]" /> Observed
+          <span className="w-3 h-0.5 bg-[#111827]" /> Observed
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-3 h-0.5 bg-[#168568]" /> Experimentally Supported
@@ -263,7 +263,7 @@ export function CausalFlowGraph({
           <span className="w-3 h-0.5 border-t border-dashed border-[#D78A43]" /> Inferred
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-0.5 border-t border-dotted border-[#DCE2EB]" /> Unknown
+          <span className="w-3 h-0.5 border-t border-dotted border-[#E5E7EB]" /> Unknown
         </span>
       </div>
 
@@ -277,8 +277,8 @@ export function CausalFlowGraph({
         minZoom={0.2}
         maxZoom={1.5}
       >
-        <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#DCE2EB" />
-        <Controls className="!bg-white !border-[#DCE2EB] !rounded-xl !shadow-card" />
+        <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#E5E7EB" />
+        <Controls className="!bg-white !border-[#E5E7EB] !rounded-xl !shadow-card" />
         <MiniMap
           nodeColor={(n) => {
             const dataNode = n.data?.node as CausalNodeItem | undefined;
@@ -287,7 +287,7 @@ export function CausalFlowGraph({
             if (dataNode?.severity === "verified") return "#168568";
             return "#3558D4";
           }}
-          className="!bg-white !border-[#DCE2EB] !rounded-xl !shadow-card !bottom-4 !right-4"
+          className="!bg-white !border-[#E5E7EB] !rounded-xl !shadow-card !bottom-4 !right-4"
         />
       </ReactFlow>
     </div>

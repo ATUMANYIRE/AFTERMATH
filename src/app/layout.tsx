@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "AFTERMATH — The Release Time Machine",
   description:
     "Every release has consequences. See them before production. Built for GitLab Life After Code Hackathon.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -16,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased min-h-screen bg-[#FAF9F6] text-[#172033]">
+      <body className="antialiased min-h-screen bg-[#F7F8FA] text-[#111827]">
         <Providers>
           <NavigationShell>{children}</NavigationShell>
         </Providers>

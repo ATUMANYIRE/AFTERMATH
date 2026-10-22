@@ -13,19 +13,19 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const variantStyles = {
-    default: "bg-[#F1F5F9] text-[#475569] border-[#E2E8F0]",
+    default: "bg-[#F3F4F6] text-[#4B5563] border-[#E5E7EB]",
     success: "bg-[#ECFDF5] text-[#168568] border-[#A7F3D0]/60",
     warning: "bg-[#FFFBEB] text-[#D78A43] border-[#FDE68A]/60",
     error: "bg-[#FEF2F2] text-[#C74747] border-[#FECACA]/60",
-    accent: "bg-[#EFF4FE] text-[#3558D4] border-[#BFD5FB]/60",
+    accent: "bg-[#FFF7ED] text-[#EA580C] border-[#FED7AA]/60",
   }[variant];
 
   const dotColors = {
-    default: "bg-[#94A3B8]",
+    default: "bg-[#9CA3AF]",
     success: "bg-[#168568]",
     warning: "bg-[#D78A43]",
     error: "bg-[#C74747]",
-    accent: "bg-[#3558D4]",
+    accent: "bg-[#F97316]",
   }[variant];
 
   return (

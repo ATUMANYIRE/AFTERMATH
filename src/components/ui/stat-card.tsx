@@ -32,50 +32,53 @@ export function StatCard({
 }: StatCardProps) {
   const tagBg = {
     default: "bg-[#F0F1F3] text-[#747B87]",
-    success: "bg-[#F0FDF4] text-[#22C55E]",
-    warning: "bg-[#FFFBEB] text-[#D97706]",
+    success: "bg-[#F4F5F7] text-[#747B87]",
+    warning: "bg-[#FFF5EC] text-[#FF6A13]",
     error: "bg-[#F0F1F3] text-[#747B87]",
     accent: "bg-[#FFF5EC] text-[#FF6A13]",
   }[tagVariant];
 
   return (
     <div
-      className={`bg-white rounded-2xl border border-[#ECEEF1] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.03)] transition-all flex flex-col justify-between ${className}`}
+      className={`bg-white rounded-[13px] border border-[#ECEEF1] p-5 flex flex-col justify-between ${className}`}
     >
       <div>
-        {tag && (
-          <div className="mb-3">
-            <span
-              className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-medium ${tagBg}`}
-            >
-              {tag}
-            </span>
-          </div>
-        )}
-        <h4 className="text-[13px] font-normal text-[#747B87] tracking-normal mb-1">
+                <h4 className="typo-card-heading text-[#747B87] mb-1">
           {title}
         </h4>
-        <div className="flex items-baseline gap-2 mb-1.5">
-          <span
-            className={`font-semibold text-[#191C24] tracking-tight leading-tight break-words ${
-              typeof value === "string" && value.length > 14
-                ? "text-[20px] lg:text-[22px]"
-                : typeof value === "string" && value.length > 8
-                ? "text-[24px] lg:text-[28px]"
-                : "text-[32px] lg:text-[36px]"
-            }`}
-          >
-            {value}
-          </span>
+        <div className="flex items-baseline gap-2 mb-1.5 whitespace-nowrap min-h-[48px]">
+          {(() => {
+            const str = String(value);
+            const m = str.match(/^(\$?\d[\d.,]*(?:%|ms|x)?)(?:\s+(.+))?$/);
+            if (m && m[1].length <= 9) {
+              return (
+                <>
+                  <span className="typo-metric-primary text-[#191C24]">{m[1]}</span>
+                  {m[2] && <span className="typo-description text-[#747B87] self-end pb-[11px]">{m[2]}</span>}
+                </>
+              );
+            }
+            return (
+              <span
+                className={`text-[#191C24] ${
+                  str.length > 14
+                    ? "text-[20px] leading-[48px] tracking-[-0.5px]"
+                    : "typo-metric-secondary leading-[48px]"
+                }`}
+              >
+                {str}
+              </span>
+            );
+          })()}
         </div>
         {delta && (
-          <div className="flex items-center gap-1.5 text-xs font-normal">
+          <div className="flex items-center gap-1.5 typo-description">
             <span
               className={
                 delta.isRisk
                   ? "text-[#FF6A13]"
                   : delta.isPositive
-                  ? "text-[#22C55E]"
+                  ? "text-[#747B87]"
                   : "text-[#747B87]"
               }
             >
@@ -84,20 +87,20 @@ export function StatCard({
           </div>
         )}
         {description && (
-          <p className="text-xs text-[#747B87] leading-relaxed mt-1">
+          <p className="typo-description text-[#747B87] mt-1">
             {description}
           </p>
         )}
       </div>
 
       {subStats && subStats.length > 0 && (
-        <div className="mt-5 pt-3.5 border-t border-[#ECEEF1] grid grid-cols-2 gap-4">
+        <div className="mt-5 pt-3 border-t border-[#ECEEF1] space-y-1.5">
           {subStats.map((sub, i) => (
-            <div key={i}>
-              <span className="block text-[11px] font-normal text-[#747B87]">
+            <div key={i} className="flex items-baseline justify-between gap-3">
+              <span className="typo-card-footer-label text-[#747B87] whitespace-nowrap">
                 {sub.label}
               </span>
-              <span className="block text-sm font-semibold text-[#191C24] mt-0.5">
+              <span className="typo-body text-[#191C24] text-right whitespace-nowrap">
                 {sub.value}
               </span>
             </div>

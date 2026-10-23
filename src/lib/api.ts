@@ -477,6 +477,33 @@ export interface CausalPathTraceItem {
 }
 
 // Fetch helper with standard timeout and error handling
+// No authenticated GitLab Duo execution exists in local runs, so seeded wording that
+// attributes patches or traces to Duo is rewritten to say they are locally generated.
+const DUO_WORDING: Array<[RegExp, string]> = [
+  [/GitLab Duo Code Assistant \(Emulated Reference Engine\)/g, "Local reference remediation engine (emulated)"],
+  [/Duo[- ]Agent[- ]Repaired|Duo-Repaired/g, "Repaired"],
+  [/Duo-suggested/g, "Locally synthesized"],
+  [/with Duo atomic patch/g, "with the atomic patch"],
+  [/Duo atomic/g, "Atomic"],
+  [/duo_audit/g, "local_audit"],
+  [/\(Duo\)/g, ""],
+];
+
+function neutralizeDuoClaims<T>(value: T): T {
+  if (typeof value === "string") {
+    return DUO_WORDING.reduce((acc, [re, to]) => acc.replace(re, to), value as string).trim() as T;
+  }
+  if (Array.isArray(value)) return value.map(neutralizeDuoClaims) as T;
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      out[k] = k === "yaml_content" || k === "content" ? v : neutralizeDuoClaims(v);
+    }
+    return out as T;
+  }
+  return value;
+}
+
 async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${path}`;
   const res = await fetch(url, {
@@ -498,7 +525,7 @@ async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
     throw new Error(errorMsg);
   }
 
-  return res.json();
+  return neutralizeDuoClaims(await res.json());
 }
 
 export const api = {

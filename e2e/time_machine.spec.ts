@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Consequence Laboratory E2E", () => {
   test("loads Release Time Machine and displays invariant comparison", async ({ page }) => {
-    await page.goto("http://localhost:3000/time-machine");
+    await page.goto("/time-machine");
 
     // Check title and header
     await expect(page.locator("h1")).toContainText("Release Time Machine");

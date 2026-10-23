@@ -31,7 +31,7 @@ security:secret_detection:
         echo "ERROR: Exposed GitLab Personal Access Token detected!"
         exit 1
       fi
-    - echo "Secret detection passed: No exposed credentials found."
+    - 'echo "Secret detection passed - no exposed credentials found."'
 
 security:dependency_check:
   stage: security

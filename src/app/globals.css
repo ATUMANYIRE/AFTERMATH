@@ -24,16 +24,175 @@
     --input: 220 13% 93%;
     --ring: 24 100% 54%;
     --radius: 0.875rem;
+
+    /* Centralized Typography Tokens */
+    --font-page-title: 22px;
+    --font-card-heading: 14px;
+    --font-metric-primary: 40px;
+    --font-metric-secondary: 24px;
+    --font-metric-chart: 26px;
+    --font-body: 13px;
+    --font-description: 12px;
+    --font-navigation: 13px;
+    --font-button: 12px;
+    --font-badge: 10px;
   }
 
   body {
     background-color: #F8F9FB;
     color: #191C24;
-    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-inter), Inter, sans-serif;
+    font-size: var(--font-body);
+    line-height: 20px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
+}
+
+strong, b, th { font-weight: 500; }
+th { white-space: nowrap; }
+button { white-space: nowrap; }
+
+/* SpendHub Typography Tokens */
+.typo-page-title {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 30px;
+  letter-spacing: -0.5px;
+}
+
+.typo-brand-name {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+}
+
+.typo-brand-subtitle {
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 15px;
+  letter-spacing: 0px;
+}
+
+.typo-nav {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: -0.1px;
+}
+
+.typo-search {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0px;
+}
+
+.typo-card-heading {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  letter-spacing: -0.2px;
+}
+
+.typo-metric-primary {
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 48px;
+  letter-spacing: -1.8px;
+}
+
+.typo-metric-secondary {
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 31px;
+  letter-spacing: -0.7px;
+}
+
+.typo-metric-chart {
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 34px;
+  letter-spacing: -0.8px;
+}
+
+.typo-body {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: -0.1px;
+}
+
+.typo-description {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0px;
+}
+
+.typo-card-footer-label {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0px;
+}
+
+.typo-card-footer-val {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: -0.2px;
+}
+
+.typo-button {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.1px;
+}
+
+.typo-badge {
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 15px;
+  letter-spacing: 0px;
+}
+
+.typo-table-head {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 17px;
+  letter-spacing: 0px;
+}
+
+.typo-table-body {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 19px;
+  letter-spacing: 0px;
+}
+
+.typo-timeline-time {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0px;
+}
+
+.typo-timeline-desc {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 19px;
+  letter-spacing: 0px;
+}
+
+.typo-code {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 19px;
+  letter-spacing: 0px;
 }
 
 /* Custom scrollbars for data tables and timelines */

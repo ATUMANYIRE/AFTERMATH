@@ -34,6 +34,7 @@ async def compare_experiments(release_id: str, db: AsyncSession = Depends(get_db
     exp_vuln_stmt = (
         select(Experiment)
         .where(Experiment.release_id == release_id, Experiment.variant == "vulnerable")
+        .order_by(Experiment.started_at.desc())
         .options(selectinload(Experiment.events), selectinload(Experiment.evidences))
     )
     exp_vuln = (await db.execute(exp_vuln_stmt)).scalars().first()
@@ -42,9 +43,21 @@ async def compare_experiments(release_id: str, db: AsyncSession = Depends(get_db
     exp_rep_stmt = (
         select(Experiment)
         .where(Experiment.release_id == release_id, Experiment.variant == "repaired")
+        .order_by(Experiment.started_at.desc())
         .options(selectinload(Experiment.events), selectinload(Experiment.evidences))
     )
-    exp_rep = (await db.execute(exp_rep_stmt)).scalars().first()
+    # Prefer the repaired run from the same scenario and seed as the vulnerable one, so runs are never mixed.
+    candidates = (await db.execute(exp_rep_stmt)).scalars().all()
+    exp_rep = next(
+        (
+            e
+            for e in candidates
+            if exp_vuln
+            and e.scenario_id == exp_vuln.scenario_id
+            and e.reproducibility_seed == exp_vuln.reproducibility_seed
+        ),
+        candidates[0] if candidates else None,
+    )
 
     if not exp_vuln or not exp_rep:
         raise HTTPException(

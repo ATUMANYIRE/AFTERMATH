@@ -13,26 +13,26 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const variantStyles = {
-    default: "bg-[#F0F1F3] text-[#747B87] border-[#ECEEF1]",
+    default: "bg-[#F4F5F7] text-[#747B87] border-transparent",
     neutral: "bg-[#F0F1F3] text-[#747B87] border-transparent",
-    success: "bg-[#F0FDF4] text-[#22C55E] border-[#DCFCE7]",
-    warning: "bg-[#FFFBEB] text-[#D97706] border-[#FEF3C7]",
-    error: "bg-[#FEF2F2] text-[#DC2626] border-[#FEE2E2]",
-    accent: "bg-[#FFF5EC] text-[#FF6A13] border-[#FFE2CC]",
+    success: "bg-[#F4F5F7] text-[#747B87] border-transparent",
+    warning: "bg-[#FFF5EC] text-[#FF6A13] border-transparent",
+    error: "bg-[#FFF5EC] text-[#FF6A13] border-transparent",
+    accent: "bg-[#FFF5EC] text-[#FF6A13] border-transparent",
   }[variant];
 
   const dotColors = {
     default: "bg-[#969CA6]",
     neutral: "bg-[#969CA6]",
-    success: "bg-[#22C55E]",
-    warning: "bg-[#D97706]",
-    error: "bg-[#DC2626]",
+    success: "bg-[#191C24]/40",
+    warning: "bg-[#FFF5EC] text-[#FF6A13] border-transparent",
+    error: "bg-[#FF6A13]",
     accent: "bg-[#FF6A13]",
   }[variant];
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${variantStyles} ${className}`}
+      className={`inline-flex items-center whitespace-nowrap gap-1.5 px-2 py-0.5 rounded-full typo-badge border ${variantStyles} ${className}`}
       {...props}
     >
       {dot && (

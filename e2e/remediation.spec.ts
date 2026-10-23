@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Autonomous Remediation & Fix Verification Studio E2E", () => {
   test("inspects unified diff, executes sandbox verification, and signs off patch approval", async ({ page }) => {
     // 1. Navigate to Remediation Studio
-    await page.goto("http://localhost:3000/remediation");
+    await page.goto("/remediation");
 
     // 2. Verify Studio Header & Stepper
     await expect(page.locator("h1")).toContainText("Remediation Studio & Fix Verification");

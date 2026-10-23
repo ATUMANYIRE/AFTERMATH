@@ -47,6 +47,7 @@ export default function InvestigationPage() {
   const [selectedRelease] = useState("rel-2026-001");
   const [selectedVariant, setSelectedVariant] = useState<"vulnerable" | "repaired" | "both">("vulnerable");
   const [selectedNode, setSelectedNode] = useState<CausalNodeItem | null>(null);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
   const [activePathTrace, setActivePathTrace] = useState<CausalPathTraceItem | null>(null);
   const [isTracing, setIsTracing] = useState(false);
 
@@ -117,27 +118,27 @@ export default function InvestigationPage() {
   if (graphLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-28 bg-white rounded-2xl border border-[#ECEEF1]" />
+        <div className="h-28 bg-white rounded-[13px] border border-[#ECEEF1]" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-44 bg-white rounded-2xl border border-[#ECEEF1]" />
+            <div key={i} className="h-44 bg-white rounded-[13px] border border-[#ECEEF1]" />
           ))}
         </div>
-        <div className="h-[580px] bg-white rounded-2xl border border-[#ECEEF1]" />
+        <div className="h-[580px] bg-white rounded-[13px] border border-[#ECEEF1]" />
       </div>
     );
   }
 
   if (graphError || !causalGraph) {
     return (
-      <div className="bg-white border border-rose-200 rounded-2xl p-10 text-center max-w-xl mx-auto my-16 shadow-card">
-        <div className="w-12 h-12 rounded-full bg-rose-50 text-[#C74747] flex items-center justify-center mx-auto mb-4">
+      <div className="bg-white border border-[#ECEEF1] rounded-[13px] p-10 text-center max-w-xl mx-auto my-16">
+        <div className="w-12 h-12 rounded-full bg-[#F4F5F7] text-[#FF6A13] flex items-center justify-center mx-auto mb-4">
           <ShieldAlert className="w-6 h-6" />
         </div>
-        <h3 className="text-lg font-semibold text-[#191C24] mb-1">
+        <h3 className="text-[14px]  text-[#191C24] mb-1">
           Causal Graph Unavailable
         </h3>
-        <p className="text-sm text-[#747B87] mb-6">
+        <p className="text-[13px] text-[#747B87] mb-6">
           Failed to fetch directed causal graph for {selectedRelease}.
         </p>
         <Button onClick={() => refetchGraph()} variant="primary" icon={<RefreshCw className="w-4 h-4" />}>
@@ -161,24 +162,16 @@ export default function InvestigationPage() {
           ========================================================================= */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F0F1F3] text-[#20242D] border border-[#ECEEF1]/60">
-              <Compass className="w-3 h-3 text-[#20242D]" />
-              Causal Graph &amp; Blast Radius
-            </span>
-            <span className="text-xs text-[#747B87]">|</span>
-            <span className="text-xs text-[#747B87]">Empirical Dependency Intelligence</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#191C24]">
+          <span className="sr-only">Causal Graph &amp; Blast Radius · Empirical Dependency Intelligence</span>
+          <h1 className="typo-page-title text-[#191C24]">
             Causal Graph &amp; Blast Radius
           </h1>
-          <p className="text-sm text-[#747B87] mt-1 max-w-2xl leading-relaxed">
-            Persistent directed graph connecting source code defects, concurrency windows, database pool starvation, and customer financial risk.
+          <p className="typo-description text-[#747B87] mt-0.5">How a code defect spreads into customer financial risk.
           </p>
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 sm:shrink-0">
           {activePathTrace && (
             <Button onClick={handleClearTrace} variant="outline" size="md" icon={<RotateCcw className="w-3.5 h-3.5" />}>
               Reset Trace
@@ -266,46 +259,46 @@ export default function InvestigationPage() {
           3. SIGNATURE CAUSAL PATH STEPPER (When trace active)
           ========================================================================= */}
       {activePathTrace && activePathTrace.path_found && (
-        <div className="bg-rose-50/70 border border-rose-200 rounded-2xl p-5 shadow-card space-y-3">
+        <div className="bg-[#F4F5F7]/70 border border-[#ECEEF1] rounded-[13px] p-5 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#C74747] animate-ping" />
-              <h3 className="text-xs font-bold font-mono uppercase text-[#C74747]">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#FF6A13] animate-ping" />
+              <h3 className="text-[12px]  text-[#FF6A13]">
                 Active Causal Path: Code Change &rarr; Duplicate Debit Consequence ({activePathTrace.path_length} Steps)
               </h3>
             </div>
             <button
               onClick={handleClearTrace}
-              className="text-[11px] font-mono text-[#C74747] hover:underline inline-flex items-center gap-1 cursor-pointer"
+              className="text-[11px] font-mono text-[#FF6A13] hover:underline inline-flex items-center gap-1 cursor-pointer"
             >
               <RotateCcw className="w-3 h-3" />
               Reset Path Highlight
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-xs">
+          <div className="flex flex-wrap items-center gap-2 text-[12px]">
             {activePathTrace.steps.map((step, idx) => (
               <React.Fragment key={step.step_index}>
                 <div
                   onClick={() => setSelectedNode(step.node)}
-                  className={`px-2.5 py-1.5 rounded-xl border text-xs font-mono cursor-pointer transition-all ${
+                  className={`px-2.5 py-1.5 rounded-[13px] border text-[12px] font-mono cursor-pointer transition-all ${
                     selectedNode?.id === step.node.id
-                      ? "bg-[#C74747] text-white border-[#C74747]"
-                      : "bg-white border-rose-200 text-[#C74747] hover:bg-rose-50"
+                      ? "bg-[#FF6A13] text-white border-[#FF6A13]"
+                      : "bg-white border-[#ECEEF1] text-[#FF6A13] hover:bg-[#F4F5F7]"
                   }`}
                 >
-                  <span className="font-bold mr-1">[{idx + 1}]</span>
+                  <span className=" mr-1">[{idx + 1}]</span>
                   <span>{step.node.label}</span>
                 </div>
                 {idx < activePathTrace.steps.length - 1 && (
-                  <ArrowRight className="w-3.5 h-3.5 text-rose-300" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#191C24]" />
                 )}
               </React.Fragment>
             ))}
           </div>
 
-          <p className="text-xs text-[#191C24] bg-white p-3 rounded-xl border border-rose-200/60 leading-relaxed">
-            <strong className="text-[#C74747]">Causal Explanation:</strong> Git commit <code>a8f9c21b</code> removed thread synchronization. Injected client retry triggers parallel execution inside the synthetic payment gateway, debited customer orders twice, strictly violating invariant <code>INV-PAY-001</code>.
+          <p className="text-[12px] text-[#191C24] bg-white p-3 rounded-[13px] border border-[#ECEEF1]/60 leading-relaxed">
+            <strong className="text-[#FF6A13]">Causal Explanation:</strong> Git commit <code>a8f9c21b</code> removed thread synchronization. Injected client retry triggers parallel execution inside the synthetic payment gateway, debited customer orders twice, strictly violating invariant <code>INV-PAY-001</code>.
           </p>
         </div>
       )}
@@ -313,28 +306,31 @@ export default function InvestigationPage() {
       {/* =========================================================================
           4. MAIN CANVAS & CONTEXTUAL EVIDENCE INSPECTOR (Split Layout)
           ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className={`grid grid-cols-1 gap-4 ${inspectorOpen ? "lg:grid-cols-[minmax(0,1fr)_340px]" : ""}`}>
         {/* Graph Canvas Column (8 cols) */}
-        <div className="lg:col-span-8 space-y-4">
-          <div className="bg-white rounded-2xl border border-[#ECEEF1] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-card">
+        <div className="min-w-0 space-y-3">
+          <div className="bg-white rounded-[13px] border border-[#ECEEF1] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-[#191C24]">Release Variant:</span>
+              <span className="text-[12px]  text-[#191C24]">Release Variant:</span>
               <SegmentedTabs
                 size="sm"
                 options={[
                   { id: "vulnerable", label: "Vulnerable (Unpatched)" },
-                  { id: "repaired", label: "Repaired (Duo)" },
+                  { id: "repaired", label: "Repaired" },
                   { id: "both", label: "Both (Superposition)" },
                 ]}
                 activeId={selectedVariant}
                 onChange={(id) => setSelectedVariant(id as any)}
               />
             </div>
-
-            <div className="text-xs text-[#747B87] flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#168568]" />
-              <span>Click any node to inspect evidence</span>
-            </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setInspectorOpen((v) => !v)}
+              aria-expanded={inspectorOpen}
+            >
+              {inspectorOpen ? "Hide inspector" : "Show inspector"}
+            </Button>
           </div>
 
           {/* Interactive Graph Canvas */}
@@ -349,12 +345,13 @@ export default function InvestigationPage() {
         </div>
 
         {/* Evidence & Node Inspector Column (4 cols) */}
-        <div className="lg:col-span-4 space-y-4">
-          <Card className="h-full flex flex-col justify-between">
+        {inspectorOpen && (
+        <div className="min-w-0">
+          <Card className="flex flex-col justify-between lg:sticky lg:top-4 lg:max-h-[calc(100vh-32px)] overflow-y-auto">
             <div>
               <CardHeader className="border-b border-[#ECEEF1]/80 pb-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-[#747B87] uppercase tracking-wider">
+                  <span className="text-[12px]  text-[#747B87]">
                     Contextual Inspector
                   </span>
                   {selectedNode && (
@@ -363,7 +360,7 @@ export default function InvestigationPage() {
                     </Badge>
                   )}
                 </div>
-                <CardTitle className="text-base mt-1">
+                <CardTitle className="text-[14px] mt-1">
                   {selectedNode ? selectedNode.label : "Select a Node to Inspect"}
                 </CardTitle>
                 <CardDescription>
@@ -373,35 +370,51 @@ export default function InvestigationPage() {
                 </CardDescription>
               </CardHeader>
 
-              <CardContent className="pt-4 space-y-4 text-xs">
+              <CardContent className="pt-4 space-y-4 text-[12px]">
                 {selectedNode ? (
                   <>
                     <div>
-                      <span className="text-[#747B87] font-semibold block mb-1">Description:</span>
-                      <p className="text-[#191C24] leading-relaxed bg-[#F8F9FB] p-3 rounded-xl border border-[#ECEEF1]/70">
+                      <span className="text-[#747B87]  block mb-1">Description:</span>
+                      <p className="text-[#191C24] leading-relaxed bg-[#F8F9FB] p-3 rounded-[13px] border border-[#ECEEF1]/70">
                         {selectedNode.description || "No extended description provided."}
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="p-2.5 rounded-xl bg-[#F8F9FB] border border-[#ECEEF1]/70">
-                        <span className="text-[#747B87] block text-[10px] uppercase font-bold">Provenance Type</span>
-                        <span className="font-semibold text-[#191C24] block mt-0.5">
+                    <div className="grid grid-cols-2 gap-2 text-[12px]">
+                      <div className="p-2.5 rounded-[13px] bg-[#F8F9FB] border border-[#ECEEF1]/70">
+                        <span className="text-[#747B87] block text-[10px] ">Provenance Type</span>
+                        <span className=" text-[#191C24] block mt-0.5">
                           {selectedNode.provenance_type.replace(/_/g, " ")}
                         </span>
                       </div>
-                      <div className="p-2.5 rounded-xl bg-[#F8F9FB] border border-[#ECEEF1]/70">
-                        <span className="text-[#747B87] block text-[10px] uppercase font-bold">Provenance Ref</span>
-                        <span className="font-mono font-semibold text-[#191C24] block mt-0.5 truncate">
+                      <div className="p-2.5 rounded-[13px] bg-[#F8F9FB] border border-[#ECEEF1]/70">
+                        <span className="text-[#747B87] block text-[10px] ">Provenance Ref</span>
+                        <span className="font-mono  text-[#191C24] block mt-0.5 truncate">
                           {selectedNode.provenance_id || "N/A"}
                         </span>
                       </div>
                     </div>
 
+                    {selectedNode.metadata_json && (
+                      <div>
+                        <span className="text-[#747B87] block mb-1">Evidence details</span>
+                        <dl className="divide-y divide-[#ECEEF1] border border-[#ECEEF1] rounded-[10px]">
+                          {Object.entries(selectedNode.metadata_json)
+                            .filter(([k]) => !["x", "y", "raw_log_excerpt"].includes(k))
+                            .map(([k, v]) => (
+                              <div key={k} className="flex items-baseline justify-between gap-3 px-3 py-1.5">
+                                <dt className="text-[#747B87] whitespace-nowrap">{k.replace(/_/g, " ")}</dt>
+                                <dd className="text-[#191C24] text-right break-all">{String(v)}</dd>
+                              </div>
+                            ))}
+                        </dl>
+                      </div>
+                    )}
+
                     {Boolean(selectedNode.metadata_json?.raw_log_excerpt) && (
                       <div>
-                        <span className="text-[#747B87] font-semibold block mb-1">Empirical Log Evidence:</span>
-                        <pre className="p-3 bg-slate-900 text-slate-100 rounded-xl font-mono text-[10px] overflow-x-auto leading-relaxed">
+                        <span className="text-[#747B87]  block mb-1">Empirical Log Evidence:</span>
+                        <pre className="p-3 bg-[#F4F5F7] text-[#191C24] rounded-[13px] font-mono text-[10px] overflow-x-auto leading-relaxed">
                           {String(selectedNode.metadata_json.raw_log_excerpt)}
                         </pre>
                       </div>
@@ -409,7 +422,7 @@ export default function InvestigationPage() {
                   </>
                 ) : (
                   <div className="py-12 text-center text-[#747B87] space-y-3">
-                    <Compass className="w-10 h-10 text-[#20242D]/40 mx-auto" />
+                    <Compass className="w-10 h-10 text-[#191C24]/40 mx-auto" />
                     <p className="max-w-xs mx-auto">
                       Click on any node in the canvas or use the <strong className="text-[#191C24]">Trace Duplicate Debit Causal Path</strong> button to step through the causal sequence.
                     </p>
@@ -419,7 +432,7 @@ export default function InvestigationPage() {
             </div>
 
             {selectedNode && (
-              <div className="p-4 border-t border-[#ECEEF1] bg-[#F8F9FB] rounded-b-2xl flex flex-col gap-2">
+              <div className="p-4 border-t border-[#ECEEF1] bg-[#F8F9FB] rounded-b-[13px] flex flex-col gap-2">
                 <Link href="/remediation" className="w-full block">
                   <Button variant="primary" size="sm" icon={<Wrench className="w-3.5 h-3.5" />} className="w-full justify-center">
                     Proceed to Remediation Studio
@@ -434,30 +447,31 @@ export default function InvestigationPage() {
             )}
           </Card>
         </div>
+        )}
       </div>
 
       {/* =========================================================================
           4. QUANTIFIED BLAST RADIUS BREAKDOWN TABLE
           ========================================================================= */}
       {blastRadius && (
-        <div className="bg-white rounded-2xl border border-[#ECEEF1] overflow-hidden shadow-card">
+        <div className="bg-white rounded-[13px] border border-[#ECEEF1] overflow-hidden">
           <div className="p-6 border-b border-[#ECEEF1] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-base font-bold text-[#191C24]">
+              <h3 className="text-[14px]  text-[#191C24]">
                 Empirical Blast Radius Breakdown
               </h3>
-              <p className="text-xs text-[#747B87] mt-0.5">
+              <p className="text-[12px] text-[#747B87] mt-0.5">
                 Downstream services impacted by the concurrency defect in services/payment_worker/processor.py
               </p>
             </div>
-            <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-rose-50 text-[#C74747] font-semibold border border-rose-200">
+            <span className="text-[12px] font-mono px-2.5 py-1 rounded-full bg-[#F4F5F7] text-[#FF6A13]  border border-[#ECEEF1]">
               Total Risk: ${blastRadius.financial_exposure_usd.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F9FB] text-[#747B87] font-medium border-b border-[#ECEEF1]">
+            <table className="w-full text-left text-[12px]">
+              <thead className="bg-[#F8F9FB] text-[#747B87]  border-b border-[#ECEEF1]">
                 <tr>
                   <th className="px-6 py-3">Impacted Service</th>
                   <th className="px-5 py-3">Cascading Failure Mode</th>
@@ -468,55 +482,55 @@ export default function InvestigationPage() {
               </thead>
               <tbody className="divide-y divide-[#ECEEF1]/60">
                 <tr className="hover:bg-[#F8F9FB]/50">
-                  <td className="px-6 py-3.5 font-bold font-mono text-[#191C24]">
+                  <td className="px-6 py-3.5  font-mono text-[#191C24] whitespace-nowrap">
                     payment-service
                   </td>
-                  <td className="px-5 py-3.5 text-[#C74747] font-semibold">
+                  <td className="px-5 py-3.5 text-[#FF6A13]  whitespace-nowrap">
                     INV-PAY-001 Double Debits (4 charges)
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-[#747B87]">
+                  <td className="px-5 py-3.5 typo-table-body text-[#747B87] whitespace-nowrap">
                     +40ms race gap
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-[#747B87]">
+                  <td className="px-5 py-3.5 typo-table-body text-[#747B87] whitespace-nowrap">
                     exp-vuln-001 (5 concurrent checkouts)
                   </td>
-                  <td className="px-6 py-3.5 text-[#168568] font-bold">
+                  <td className="px-6 py-3.5 text-[#191C24]  whitespace-nowrap">
                     0 Duplicate Debits (Deduped)
                   </td>
                 </tr>
 
                 <tr className="hover:bg-[#F8F9FB]/50">
-                  <td className="px-6 py-3.5 font-bold font-mono text-[#191C24]">
+                  <td className="px-6 py-3.5  font-mono text-[#191C24] whitespace-nowrap">
                     ledger-db (PostgreSQL 16)
                   </td>
-                  <td className="px-5 py-3.5 text-[#D78A43] font-semibold">
+                  <td className="px-5 py-3.5 text-[#FF6A13]  whitespace-nowrap">
                     Connection Pool Starvation (342 Waiters)
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-[#747B87]">
+                  <td className="px-5 py-3.5 typo-table-body text-[#747B87] whitespace-nowrap">
                     +1,600ms onset
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-[#747B87]">
+                  <td className="px-5 py-3.5 typo-table-body text-[#747B87] whitespace-nowrap">
                     evi-002 (Pool max size 100 exhausted)
                   </td>
-                  <td className="px-6 py-3.5 text-[#168568] font-bold">
+                  <td className="px-6 py-3.5 text-[#191C24]  whitespace-nowrap">
                     Pool Nominal (0 Waiters)
                   </td>
                 </tr>
 
                 <tr className="hover:bg-[#F8F9FB]/50">
-                  <td className="px-6 py-3.5 font-bold font-mono text-[#191C24]">
+                  <td className="px-6 py-3.5  font-mono text-[#191C24] whitespace-nowrap">
                     checkout-worker
                   </td>
-                  <td className="px-5 py-3.5 text-[#D78A43] font-semibold">
+                  <td className="px-5 py-3.5 text-[#FF6A13]  whitespace-nowrap">
                     Retry Storm Cascade
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-[#747B87]">
+                  <td className="px-5 py-3.5 typo-table-body text-[#747B87] whitespace-nowrap">
                     +2,100ms onset
                   </td>
-                  <td className="px-5 py-3.5 font-mono text-[#747B87]">
+                  <td className="px-5 py-3.5 typo-table-body text-[#747B87] whitespace-nowrap">
                     Unbounded Exponential Retries
                   </td>
-                  <td className="px-6 py-3.5 text-[#168568] font-bold">
+                  <td className="px-6 py-3.5 text-[#191C24]  whitespace-nowrap">
                     Single Execution (SLA 68ms)
                   </td>
                 </tr>

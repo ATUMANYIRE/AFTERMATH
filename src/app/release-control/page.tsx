@@ -82,13 +82,13 @@ export default function ReleaseControlPage() {
   if (controlLoading || superpositionLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-28 bg-white rounded-2xl border border-[#ECEEF1]" />
+        <div className="h-28 bg-white rounded-[13px] border border-[#ECEEF1]" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-44 bg-white rounded-2xl border border-[#ECEEF1]" />
+            <div key={i} className="h-44 bg-white rounded-[13px] border border-[#ECEEF1]" />
           ))}
         </div>
-        <div className="h-96 bg-white rounded-2xl border border-[#ECEEF1]" />
+        <div className="h-96 bg-white rounded-[13px] border border-[#ECEEF1]" />
       </div>
     );
   }
@@ -102,31 +102,23 @@ export default function ReleaseControlPage() {
           ========================================================================= */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F0F1F3] text-[#20242D] border border-[#ECEEF1]/60">
-              <Layers className="w-3 h-3 text-[#20242D]" />
-              Superposition &amp; Release Control
-            </span>
-            <span className="text-xs text-[#747B87]">|</span>
-            <span className="text-xs text-[#747B87]">Multi-Scenario Decision Matrix</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#191C24]">
+          <span className="sr-only">Superposition &amp; Release Control · Multi-Scenario Decision Matrix</span>
+          <h1 className="typo-page-title text-[#191C24]">
             Release Control &amp; Superposition
           </h1>
-          <p className="text-sm text-[#747B87] mt-1 max-w-2xl leading-relaxed">
-            Every release exists in a superposition of multiple failure states until empirically tested. Compare verified consequences side-by-side, evaluate blast radius mitigation, and authorize staging promotion.
+          <p className="typo-description text-[#747B87] mt-0.5">Compare every failure scenario and decide whether to promote.
           </p>
         </div>
 
         {/* Release Candidate Selector */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
           <select
             value={selectedRelease}
             onChange={(e) => setSelectedRelease(e.target.value)}
-            className="text-xs font-mono font-medium px-3.5 py-2 bg-white border border-[#ECEEF1] rounded-xl text-[#191C24] shadow-card focus:outline-none focus:border-[#20242D]"
+            className="w-full sm:w-auto min-w-0 truncate text-[12px] h-9 px-3 bg-white border border-[#ECEEF1] rounded-[10px] text-[#191C24] focus:outline-none focus:border-[#20242D]"
           >
-            <option value="rel-2026-001">rel-2026-001 (feat/distributed-checkout) — Vulnerable Target</option>
-            <option value="rel-2026-002">rel-2026-002 (main/clean-baseline) — Baseline</option>
+            <option value="rel-2026-001">rel-2026-001 (feat/distributed-checkout) · vulnerable</option>
+            <option value="rel-2026-002">rel-2026-002 (main/clean-baseline) · baseline</option>
           </select>
         </div>
       </div>
@@ -135,35 +127,35 @@ export default function ReleaseControlPage() {
           2. EXECUTIVE RECOMMENDATION CARD (Prominent Banner)
           ========================================================================= */}
       {rec && (
-        <div className="bg-white rounded-2xl border border-[#ECEEF1] p-6 lg:p-8 shadow-card space-y-4">
+        <div className="bg-white rounded-[13px] border border-[#ECEEF1] p-6 lg:p-8 space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#ECEEF1]/80">
             <div className="flex items-center gap-3">
               <Badge variant={rec.verdict === "CONDITIONAL_APPROVAL" ? "warning" : "success"}>
                 {rec.verdict.replace(/_/g, " ")}
               </Badge>
-              <h2 className="text-lg font-bold text-[#191C24]">
+              <h2 className="text-[14px]  text-[#191C24]">
                 {rec.headline}
               </h2>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-mono">
+            <div className="flex items-center gap-2 text-[12px] font-mono">
               <span className="text-[#747B87]">EMPIRICAL CONFIDENCE:</span>
-              <span className="font-bold text-[#168568] text-sm">{rec.confidence_score}%</span>
+              <span className=" text-[#191C24] text-[13px]">{rec.confidence_score}%</span>
             </div>
           </div>
 
-          <p className="text-xs text-[#191C24] leading-relaxed">
+          <p className="text-[12px] text-[#191C24] leading-relaxed">
             {rec.evidence_summary}
           </p>
 
-          <div className="p-3.5 rounded-xl bg-[#F8F9FB] border border-[#ECEEF1]/80 space-y-1.5 text-xs text-[#747B87]">
-            <span className="font-bold text-[#191C24] flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
-              <Info className="w-3.5 h-3.5 text-[#20242D]" />
+          <div className="p-3.5 rounded-[13px] bg-[#F8F9FB] border border-[#ECEEF1]/80 space-y-1.5 text-[12px] text-[#747B87]">
+            <span className=" text-[#191C24] flex items-center gap-1.5 text-[11px]">
+              <Info className="w-3.5 h-3.5 text-[#191C24]" />
               Governance &amp; External Verification Transparency
             </span>
             {rec.caveats?.map((c, i) => (
               <div key={i} className="flex items-start gap-2 text-[11px] leading-relaxed">
-                <span className="text-[#20242D] font-bold">&bull;</span>
+                <span className="text-[#191C24] ">&bull;</span>
                 <span>{c}</span>
               </div>
             ))}
@@ -239,7 +231,7 @@ export default function ReleaseControlPage() {
       {/* =========================================================================
           4. COMPARISON MATRIX VS POLICY GATES TABS
           ========================================================================= */}
-      <div className="bg-white rounded-2xl border border-[#ECEEF1] overflow-hidden shadow-card">
+      <div className="bg-white rounded-[13px] border border-[#ECEEF1] overflow-hidden">
         {/* Workspace Tab Header */}
         <div className="p-6 border-b border-[#ECEEF1] flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -253,15 +245,16 @@ export default function ReleaseControlPage() {
             />
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-mono text-[#747B87]">
+          <div className="flex items-center gap-2 text-[12px] font-mono text-[#747B87]">
             <span>Commit:</span>
-            <span className="font-semibold text-[#191C24]">{superpositionData?.commit_hash?.slice(0, 8)}</span>
+            <span className=" text-[#191C24]">{superpositionData?.commit_hash?.slice(0, 8)}</span>
           </div>
         </div>
+        <p className="px-6 py-2.5 border-b border-[#ECEEF1] typo-description text-[#747B87]">Source: simulated scenario matrix{superpositionData?.generated_at ? `, generated ${new Date(superpositionData.generated_at).toLocaleString()}` : ""}. It is separate from the Time Machine experiment runs, which are listed there with their experiment IDs, so the figures can differ.</p>
 
         {actionSuccessMsg && (
-          <div className="m-6 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-[#168568] font-medium flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-[#168568]" />
+          <div className="m-6 p-3 rounded-[13px] bg-[#F4F5F7] border border-[#ECEEF1] text-[12px] text-[#191C24]  flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-[#191C24]" />
             <span>{actionSuccessMsg}</span>
           </div>
         )}
@@ -269,8 +262,8 @@ export default function ReleaseControlPage() {
         {/* Tab 1: 5-Scenario Superposition Grid */}
         {activeTab === "superposition" && superpositionData && (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F9FB] text-[#747B87] font-medium border-b border-[#ECEEF1]">
+            <table className="w-full text-left text-[12px]">
+              <thead className="bg-[#F8F9FB] text-[#747B87]  border-b border-[#ECEEF1]">
                 <tr>
                   <th className="px-6 py-3.5">Fault Injection Vector</th>
                   <th className="px-5 py-3.5">Vulnerable Release Outcome</th>
@@ -284,40 +277,40 @@ export default function ReleaseControlPage() {
                   const exposureDelta = sc.vulnerable.exposure_usd - sc.repaired.exposure_usd;
                   return (
                     <tr key={sc.scenario_id} className="hover:bg-[#F8F9FB]/60 transition-colors">
-                      <td className="px-6 py-4">
-                        <span className="font-bold text-[#191C24] block text-xs">
+                      <td className="px-6 py-4 min-w-[300px]">
+                        <span className=" text-[#191C24] block text-[12px] whitespace-nowrap">
                           {sc.name}
                         </span>
-                        <span className="text-[11px] text-[#747B87] max-w-xs block mt-0.5">
+                        <span className="text-[11px] text-[#747B87] max-w-[280px] block mt-0.5">
                           {sc.fault_injection}
                         </span>
                       </td>
 
-                      <td className="px-5 py-4">
-                        <span className="font-semibold text-[#C74747] block">
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <span className=" text-[#FF6A13] block">
                           {sc.vulnerable.verdict}
                         </span>
-                        <div className="text-[11px] text-[#747B87] space-x-2 mt-0.5">
+                        <div className="typo-description text-[#747B87] space-x-2 mt-0.5">
                           <span>{sc.vulnerable.duplicate_debits} duplicate debits</span>
                           <span>&bull;</span>
                           <span>P95 {sc.vulnerable.p95_latency_ms}ms</span>
                         </div>
                       </td>
 
-                      <td className="px-5 py-4">
-                        <span className="font-semibold text-[#168568] block">
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <span className=" text-[#191C24] block">
                           {sc.repaired.verdict}
                         </span>
-                        <div className="text-[11px] text-[#747B87] space-x-2 mt-0.5">
+                        <div className="typo-description text-[#747B87] space-x-2 mt-0.5">
                           <span>{sc.repaired.duplicate_debits} duplicate debits</span>
                           <span>&bull;</span>
                           <span>P95 {sc.repaired.p95_latency_ms}ms</span>
                         </div>
                       </td>
 
-                      <td className="px-5 py-4 font-mono">
+                      <td className="px-5 py-4 whitespace-nowrap typo-table-body">
                         {exposureDelta > 0 ? (
-                          <span className="font-bold text-[#168568]">
+                          <span className=" text-[#191C24]">
                             -${exposureDelta.toFixed(2)} Risk Mitigated
                           </span>
                         ) : (
@@ -328,7 +321,7 @@ export default function ReleaseControlPage() {
                       <td className="px-6 py-4 text-right">
                         <Link
                           href="/time-machine"
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-[#ECEEF1] bg-white text-[#191C24] hover:bg-slate-50 font-medium text-xs transition-colors shadow-2xs"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[13px] border border-[#ECEEF1] bg-white text-[#191C24] hover:bg-[#F4F5F7]  text-[12px] transition-colors"
                         >
                           <span>Replay</span>
                           <ArrowRight className="w-3 h-3 text-[#747B87]" />
@@ -354,11 +347,11 @@ export default function ReleaseControlPage() {
                 return (
                   <div
                     key={gate.id}
-                    className="p-5 rounded-xl border border-[#ECEEF1] bg-[#F8F9FB] flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs"
+                    className="p-5 rounded-[13px] border border-[#ECEEF1] bg-[#F8F9FB] flex flex-col md:flex-row md:items-center justify-between gap-4 text-[12px]"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-[#191C24] text-sm">
+                        <span className=" text-[#191C24] text-[13px]">
                           {gate.gate_name}
                         </span>
                         <Badge
@@ -386,7 +379,7 @@ export default function ReleaseControlPage() {
                       )}
                       {isPassed && (
                         <div className="text-right">
-                          <span className="text-xs font-semibold text-[#168568] block">
+                          <span className="text-[12px]  text-[#191C24] block">
                             Approved by {gate.approver_name || "Lead SRE"}
                           </span>
                           <span className="text-[11px] text-[#747B87]">
@@ -402,9 +395,9 @@ export default function ReleaseControlPage() {
 
             {/* Gate Sign-Off Modal */}
             {selectedGate && (
-              <div className="bg-white rounded-xl border border-[#20242D] p-6 shadow-popover space-y-4">
+              <div className="bg-white rounded-[13px] border border-[#20242D] p-6 shadow-popover space-y-4">
                 <div className="flex items-center justify-between border-b border-[#ECEEF1] pb-3">
-                  <h4 className="font-bold text-sm text-[#191C24]">
+                  <h4 className=" text-[13px] text-[#191C24]">
                     Sign Off Gate: {selectedGate.gate_name}
                   </h4>
                   <button
@@ -415,41 +408,41 @@ export default function ReleaseControlPage() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[12px]">
                   <div>
-                    <label className="block font-semibold text-[#191C24] mb-1">
+                    <label className="block  text-[#191C24] mb-1">
                       Approver Name
                     </label>
                     <input
                       type="text"
                       value={approverName}
                       onChange={(e) => setApproverName(e.target.value)}
-                      className="w-full bg-[#F8F9FB] border border-[#ECEEF1] rounded-xl p-2.5 text-xs focus:bg-white focus:outline-none focus:border-[#20242D]"
+                      className="w-full bg-[#F8F9FB] border border-[#ECEEF1] rounded-[13px] p-2.5 text-[12px] focus:bg-white focus:outline-none focus:border-[#20242D]"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-semibold text-[#191C24] mb-1">
+                    <label className="block  text-[#191C24] mb-1">
                       Official Email
                     </label>
                     <input
                       type="email"
                       value={approverEmail}
                       onChange={(e) => setApproverEmail(e.target.value)}
-                      className="w-full bg-[#F8F9FB] border border-[#ECEEF1] rounded-xl p-2.5 text-xs focus:bg-white focus:outline-none focus:border-[#20242D]"
+                      className="w-full bg-[#F8F9FB] border border-[#ECEEF1] rounded-[13px] p-2.5 text-[12px] focus:bg-white focus:outline-none focus:border-[#20242D]"
                     />
                   </div>
                 </div>
 
-                <div className="text-xs">
-                  <label className="block font-semibold text-[#191C24] mb-1">
+                <div className="text-[12px]">
+                  <label className="block  text-[#191C24] mb-1">
                     Sign-off Rationale &amp; Evidence Citation
                   </label>
                   <textarea
                     rows={2}
                     value={approvalReason}
                     onChange={(e) => setApprovalReason(e.target.value)}
-                    className="w-full bg-[#F8F9FB] border border-[#ECEEF1] rounded-xl p-2.5 text-xs focus:bg-white focus:outline-none focus:border-[#20242D]"
+                    className="w-full bg-[#F8F9FB] border border-[#ECEEF1] rounded-[13px] p-2.5 text-[12px] focus:bg-white focus:outline-none focus:border-[#20242D]"
                   />
                 </div>
 

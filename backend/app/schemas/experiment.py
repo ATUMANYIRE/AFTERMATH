@@ -3,7 +3,7 @@ Pydantic schemas for Experiment, Event, Evidence, and Transaction models.
 """
 from datetime import datetime
 from typing import Optional, Dict, Any, List
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class ExperimentEventResponse(BaseModel):
@@ -96,8 +96,25 @@ class TimeMachineComparisonResponse(BaseModel):
     delta_summary: Dict[str, Any]
 
 
+KNOWN_SCENARIOS = {
+    "lost-response-retry",
+    "duplicate-idempotency-keys",
+    "concurrent-checkouts",
+    "transient-network-drop",
+    "delayed-db-commit",
+}
+
+
 class ScenarioConfigSchema(BaseModel):
-    scenario_id: str = "lost-response-retry"
+    scenario_id: str = Field(default="lost-response-retry", max_length=64)
+
+    @field_validator("scenario_id")
+    @classmethod
+    def _known_scenario(cls, v: str) -> str:
+        if v not in KNOWN_SCENARIOS:
+            raise ValueError(f"Unknown scenario_id; expected one of {sorted(KNOWN_SCENARIOS)}")
+        return v
+
     concurrency: int = Field(default=5, ge=1, le=50)
     retry_count: int = Field(default=2, ge=0, le=10)
     delay_ms: int = Field(default=120, ge=0, le=2000)

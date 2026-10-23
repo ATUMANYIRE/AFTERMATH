@@ -47,6 +47,9 @@ class Settings(BaseSettings):
                 return [i.strip() for i in v.split(",") if i.strip()]
         return v
 
+    # Access boundary for POST/PUT/PATCH/DELETE (see app/security.py). Empty = loopback-only.
+    WRITE_API_KEY: str = ""
+
     # GitLab Duo & DevSecOps Platform Integration
     GITLAB_INSTANCE_URL: str = "https://gitlab.com"
     GITLAB_PROJECT_PATH: str = "atumanyire-labs/aftermath"

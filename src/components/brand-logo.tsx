@@ -12,10 +12,10 @@ export function BrandLogo({
   className = "",
 }: BrandLogoProps) {
   const sizeMap = {
-    sm: { icon: 24, text: "text-[13px]", sub: "text-[10px]" },
-    md: { icon: 28, text: "text-[15px]", sub: "text-[11px]" },
-    lg: { icon: 36, text: "text-lg", sub: "text-xs" },
-    xl: { icon: 48, text: "text-2xl", sub: "text-sm" },
+    sm: { icon: 24, text: "text-[14px]", sub: "text-[10px]" },
+    md: { icon: 28, text: "text-[14px]", sub: "text-[10px]" },
+    lg: { icon: 36, text: "text-[16px]", sub: "text-[11px]" },
+    xl: { icon: 48, text: "text-[20px]", sub: "text-[12px]" },
   };
 
   const { icon, text, sub } = sizeMap[size];
@@ -69,10 +69,10 @@ export function BrandLogo({
       {/* Typography strictly matching SpendHub's brand typography */}
       {showWordmark && (
         <div className="flex flex-col min-w-0">
-          <span className={`font-semibold tracking-tight text-[#191C24] leading-none ${text}`}>
+          <span className={`text-[#191C24] leading-5 tracking-[-0.3px] ${text}`}>
             AFTERMATH
           </span>
-          <span className={`text-[#747B87] font-normal tracking-normal truncate leading-tight mt-1 ${sub}`}>
+          <span className={`text-[#747B87] font-normal truncate leading-[15px] ${sub}`}>
             The Release Time Machine
           </span>
         </div>

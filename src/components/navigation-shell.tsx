@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -14,6 +14,8 @@ import {
   Menu,
   X,
   ExternalLink,
+  BookOpen,
+  GitBranch,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 
@@ -25,6 +27,19 @@ export function NavigationShell({ children }: NavigationShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement;
+      if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(t.tagName)) {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const navItems = [
     {
@@ -37,7 +52,7 @@ export function NavigationShell({ children }: NavigationShellProps) {
       name: "Time Machine",
       href: "/time-machine",
       icon: Clock,
-      badge: "5", // Matches the single orange badge '5' on Transactions in SpendHub
+      badge: null,
     },
     {
       name: "Investigation",
@@ -74,7 +89,7 @@ export function NavigationShell({ children }: NavigationShellProps) {
       {/* =========================================================================
           1. PERSISTENT SPENDHUB-STYLE SIDEBAR (Width: 212px, Background: #F9FAFB)
           ========================================================================= */}
-      <aside className="hidden md:flex flex-col w-[212px] shrink-0 bg-[#F9FAFB] border-r border-[#ECEEF1] h-screen sticky top-0 px-3.5 py-6 justify-between select-none">
+      <aside className="hidden md:flex flex-col w-[212px] shrink-0 bg-[#F9FAFB] border-r border-[#ECEEF1] h-screen sticky top-0 px-3 py-5 justify-between select-none">
         <div className="space-y-6">
           {/* Brand Identity Header: Proportions strictly matching SpendHub */}
           <div className="px-1.5 pt-0.5">
@@ -87,11 +102,12 @@ export function NavigationShell({ children }: NavigationShellProps) {
           <div className="relative px-0.5">
             <Search className="w-3.5 h-3.5 text-[#969CA6] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
+              ref={searchRef}
               type="text"
               placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#F0F1F3] text-[#191C24] placeholder-[#969CA6] text-xs rounded-xl pl-8 pr-7 py-2 border border-transparent focus:border-[#ECEEF1] focus:bg-white focus:outline-none transition-all"
+              className="w-full bg-[#F0F1F3] text-[#191C24] placeholder-[#969CA6] text-[12px] rounded-[10px] pl-8 pr-7 py-2 border border-transparent focus:border-[#ECEEF1] focus:bg-white focus:outline-none transition-all"
             />
             <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-sans text-[#969CA6] bg-white border border-[#ECEEF1] px-1.5 py-0.2 rounded shadow-2xs pointer-events-none">
               /
@@ -99,7 +115,7 @@ export function NavigationShell({ children }: NavigationShellProps) {
           </div>
 
           {/* Navigation Items (Clean outline icons, white active pill, consistent spacing) */}
-          <nav className="space-y-1">
+          <nav className="space-y-0.5">
             {filteredNavItems.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -111,9 +127,9 @@ export function NavigationShell({ children }: NavigationShellProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-[13px] transition-all ${
+                  className={`flex items-center justify-between px-3 py-2 rounded-[10px] typo-nav transition-all ${
                     isActive
-                      ? "bg-white text-[#191C24] font-medium shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#ECEEF1]"
+                      ? "bg-white text-[#191C24] border border-[#ECEEF1]"
                       : "text-[#747B87] font-normal hover:text-[#191C24] hover:bg-black/[0.02]"
                   }`}
                 >
@@ -128,7 +144,7 @@ export function NavigationShell({ children }: NavigationShellProps) {
                   </div>
 
                   {item.badge && (
-                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#FF6A13] text-white leading-none">
+                    <span className="typo-badge px-1.5 py-0.5 rounded-full bg-[#FF6A13] text-white leading-none">
                       {item.badge}
                     </span>
                   )}
@@ -138,28 +154,35 @@ export function NavigationShell({ children }: NavigationShellProps) {
           </nav>
         </div>
 
-        {/* Minimal Footer: Subtle divider and secondary links */}
-        <div className="pt-4 border-t border-[#ECEEF1] px-1 space-y-2 text-[12px] text-[#747B87]">
-          <div className="flex items-center justify-between">
-            <span className="font-normal text-[11px] text-[#969CA6]">rel-2026-001</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" title="Core Nominal" />
+        {/* Footer: current release + helpful shortcuts, styled like the nav */}
+        <div className="space-y-2">
+          <div className="rounded-[10px] border border-[#ECEEF1] bg-white px-3 py-2.5">
+            <div className="flex items-center justify-between">
+              <span className="typo-description text-[#747B87]">Current release</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FF6A13]" title="Under review" />
+            </div>
+            <div className="typo-body text-[#191C24]">rel-2026-001</div>
           </div>
-          <div className="flex items-center justify-between text-[11px] pt-1">
-            <a
-              href="https://gitlab.com/atumanyire-labs/aftermath"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#191C24] flex items-center gap-1 transition-colors"
-            >
-              GitLab <ExternalLink className="w-2.5 h-2.5" />
-            </a>
+          <div className="space-y-0.5 border-t border-[#ECEEF1] pt-2">
             <a
               href="http://localhost:8000/docs"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#191C24] transition-colors"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-[10px] typo-nav text-[#747B87] hover:text-[#191C24] hover:bg-black/[0.02] transition-colors"
             >
-              API Docs
+              <BookOpen className="w-4 h-4 shrink-0" strokeWidth={1.75} />
+              <span>API docs</span>
+              <ExternalLink className="w-3 h-3 ml-auto text-[#969CA6]" />
+            </a>
+            <a
+              href="https://gitlab.com/atumanyire-labs/aftermath"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-[10px] typo-nav text-[#747B87] hover:text-[#191C24] hover:bg-black/[0.02] transition-colors"
+            >
+              <GitBranch className="w-4 h-4 shrink-0" strokeWidth={1.75} />
+              <span>GitLab repo</span>
+              <ExternalLink className="w-3 h-3 ml-auto text-[#969CA6]" />
             </a>
           </div>
         </div>
@@ -197,7 +220,7 @@ export function NavigationShell({ children }: NavigationShellProps) {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
-                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-sm ${
+                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-[13px] ${
                     isActive
                       ? "bg-slate-50 text-[#191C24] font-medium"
                       : "text-[#747B87] hover:text-[#191C24]"
@@ -208,7 +231,7 @@ export function NavigationShell({ children }: NavigationShellProps) {
                     <span>{item.name}</span>
                   </div>
                   {item.badge && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#FF6A13] text-white">
+                    <span className="text-[12px] px-2 py-0.5 rounded-full bg-[#FF6A13] text-white">
                       {item.badge}
                     </span>
                   )}
@@ -219,7 +242,7 @@ export function NavigationShell({ children }: NavigationShellProps) {
         )}
 
         {/* Main Workspace Viewport (Matches SpendHub page padding: 26px - 32px) */}
-        <main className="flex-1 p-6 md:p-8 max-w-[1400px] w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-[1400px] w-full mx-auto">
           {children}
         </main>
       </div>

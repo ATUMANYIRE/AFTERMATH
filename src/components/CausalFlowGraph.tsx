@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   ReactFlow,
-  Controls,
+  ReactFlowProvider,
+  useReactFlow,
   Background,
-  MiniMap,
   Handle,
   Position,
   NodeProps,
@@ -27,29 +27,33 @@ import {
   Database,
   ArrowRight,
   ShieldAlert,
+  Maximize2,
+  RotateCcw,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
 import { CausalNodeItem, CausalEdgeItem } from "@/lib/api";
 
 function getNodeIcon(type: string) {
   switch (type) {
     case "code_change":
-      return <GitCommit className="w-3.5 h-3.5 text-[#20242D]" />;
+      return <GitCommit className="w-3.5 h-3.5 text-[#191C24]" />;
     case "failure_condition":
-      return <AlertTriangle className="w-3.5 h-3.5 text-[#C74747]" />;
+      return <AlertTriangle className="w-3.5 h-3.5 text-[#FF6A13]" />;
     case "service":
-      return <Server className="w-3.5 h-3.5 text-[#20242D]" />;
+      return <Server className="w-3.5 h-3.5 text-[#191C24]" />;
     case "invariant":
-      return <Scale className="w-3.5 h-3.5 text-[#168568]" />;
+      return <Scale className="w-3.5 h-3.5 text-[#191C24]" />;
     case "runtime_event":
-      return <Zap className="w-3.5 h-3.5 text-[#D78A43]" />;
+      return <Zap className="w-3.5 h-3.5 text-[#FF6A13]" />;
     case "observed_consequence":
-      return <ShieldAlert className="w-3.5 h-3.5 text-[#C74747]" />;
+      return <ShieldAlert className="w-3.5 h-3.5 text-[#FF6A13]" />;
     case "hypothesized_downstream_effect":
       return <HelpCircle className="w-3.5 h-3.5 text-[#747B87]" />;
     case "remediation_candidate":
-      return <ShieldCheck className="w-3.5 h-3.5 text-[#168568]" />;
+      return <ShieldCheck className="w-3.5 h-3.5 text-[#191C24]" />;
     case "verification_evidence":
-      return <FileCheck2 className="w-3.5 h-3.5 text-[#20242D]" />;
+      return <FileCheck2 className="w-3.5 h-3.5 text-[#191C24]" />;
     default:
       return <Database className="w-3.5 h-3.5 text-[#747B87]" />;
   }
@@ -68,32 +72,32 @@ export function CausalNodeCard({ data }: NodeProps) {
   let cardBg = "bg-white";
 
   if (isPathHighlighted) {
-    borderStyle = "border-[#20242D] ring-2 ring-[#20242D]/25 shadow-md";
-    cardBg = "bg-[#F0F1F3]/40";
+    borderStyle = "border-[#20242D] ring-2 ring-[#20242D]/25";
+    cardBg = "bg-[#F4F5F7]/40";
   } else if (isSelected) {
-    borderStyle = "border-[#191C24] ring-2 ring-[#191C24]/20 shadow-md";
+    borderStyle = "border-[#191C24] ring-2 ring-[#191C24]/20";
   } else if (isCritical) {
-    borderStyle = "border-rose-200";
-    cardBg = "bg-rose-50/25";
+    borderStyle = "border-[#ECEEF1]";
+    cardBg = "bg-[#F4F5F7]/25";
   } else if (isWarning) {
-    borderStyle = "border-amber-200";
-    cardBg = "bg-amber-50/25";
+    borderStyle = "border-[#ECEEF1]";
+    cardBg = "bg-[#F4F5F7]/25";
   } else if (isVerified) {
-    borderStyle = "border-emerald-200";
-    cardBg = "bg-emerald-50/25";
+    borderStyle = "border-[#ECEEF1]";
+    cardBg = "bg-[#F4F5F7]/25";
   }
 
   const badgeColor = isCritical
-    ? "bg-rose-50 text-[#C74747] border-rose-200"
+    ? "bg-[#F4F5F7] text-[#FF6A13] border-[#ECEEF1]"
     : isWarning
-    ? "bg-amber-50 text-[#D78A43] border-amber-200"
+    ? "bg-[#F4F5F7] text-[#FF6A13] border-[#ECEEF1]"
     : isVerified
-    ? "bg-emerald-50 text-[#168568] border-emerald-200"
-    : "bg-slate-100 text-[#747B87] border-slate-200";
+    ? "bg-[#F4F5F7] text-[#191C24] border-[#ECEEF1]"
+    : "bg-[#F4F5F7] text-[#747B87] border-[#ECEEF1]";
 
   return (
     <div
-      className={`relative w-64 rounded-xl border ${borderStyle} ${cardBg} p-4 shadow-card hover:shadow-card-hover transition-all text-left font-sans cursor-pointer`}
+      className={`relative w-60 rounded-[13px] border ${borderStyle} ${cardBg} p-4 transition-all text-left font-sans cursor-pointer`}
     >
       <Handle
         type="target"
@@ -103,25 +107,25 @@ export function CausalNodeCard({ data }: NodeProps) {
 
       {/* Header: Node Type & Severity Badge */}
       <div className="flex items-center justify-between gap-1 mb-2">
-        <span className="flex items-center gap-1.5 text-[10px] font-mono uppercase font-bold text-[#747B87]">
+        <span className="flex items-center gap-1.5 text-[11px] text-[#747B87]">
           {getNodeIcon(node.node_type)}
           <span>{node.node_type.replace(/_/g, " ")}</span>
         </span>
         <span
-          className={`px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase border ${badgeColor}`}
+          className={`px-2 py-0.5 rounded-full text-[10px]  border ${badgeColor}`}
         >
           {node.severity}
         </span>
       </div>
 
       {/* Title */}
-      <h4 className="text-xs font-bold text-[#191C24] leading-tight mb-1 line-clamp-2">
+      <h4 className="text-[13px] text-[#191C24] leading-snug mb-1 line-clamp-2">
         {node.label}
       </h4>
 
       {/* Description */}
       {node.description && (
-        <p className="text-[11px] text-[#747B87] leading-snug line-clamp-2 mb-2.5">
+        <p className="text-[12px] text-[#747B87] leading-snug line-clamp-2 mb-2.5">
           {node.description}
         </p>
       )}
@@ -130,7 +134,7 @@ export function CausalNodeCard({ data }: NodeProps) {
       <div className="pt-2 border-t border-[#ECEEF1]/70 flex items-center justify-between text-[10px] font-mono text-[#747B87]">
         <span>Prov: {node.provenance_type.replace(/_/g, " ")}</span>
         {node.provenance_id && (
-          <span className="text-[#191C24] font-semibold truncate max-w-[100px]">
+          <span className="text-[#191C24]  truncate max-w-[100px]">
             {node.provenance_id}
           </span>
         )}
@@ -158,7 +162,13 @@ interface CausalFlowGraphProps {
   onSelectNode: (node: CausalNodeItem) => void;
 }
 
-export function CausalFlowGraph({
+const X_SCALE = 1.5;
+const Y_SCALE = 1.7;
+const NODE_W = 240;
+const NODE_H = 140;
+const DEFAULT_ZOOM = 0.85;
+
+function GraphCanvas({
   nodes,
   edges,
   selectedNodeId,
@@ -166,16 +176,18 @@ export function CausalFlowGraph({
   highlightedPathEdgeIds,
   onSelectNode,
 }: CausalFlowGraphProps) {
+  const rf = useReactFlow();
+  const ready = useRef(false);
+
   const flowNodes: Node[] = useMemo(() => {
     return nodes.map((n, idx) => {
       const meta = n.metadata_json || {};
       const x = typeof meta.x === "number" ? meta.x : (idx % 3) * 320 + 50;
       const y = typeof meta.y === "number" ? meta.y : Math.floor(idx / 3) * 180 + 50;
-
       return {
         id: n.id,
         type: "causalNode",
-        position: { x, y },
+        position: { x: x * X_SCALE, y: y * Y_SCALE },
         data: {
           node: n,
           isSelected: selectedNodeId === n.id,
@@ -188,108 +200,120 @@ export function CausalFlowGraph({
   const flowEdges: Edge[] = useMemo(() => {
     return edges.map((e) => {
       const isPathHighlighted = highlightedPathEdgeIds.has(e.id);
-      const isExpSupported = e.classification === "EXPERIMENTALLY_SUPPORTED";
-      const isObserved = e.classification === "OBSERVED";
-      const isInferred = e.classification === "INFERRED";
-
-      let strokeColor = "#747B87";
-      let strokeDasharray: string | undefined = undefined;
-      let strokeWidth = 1.5;
-
+      let stroke = "#9AA0AA";
+      let dash: string | undefined;
+      let width = 1.5;
       if (isPathHighlighted) {
-        strokeColor = "#20242D";
-        strokeWidth = 3;
-      } else if (isExpSupported) {
-        strokeColor = "#168568";
-        strokeWidth = 2;
-      } else if (isObserved) {
-        strokeColor = "#191C24";
-        strokeWidth = 2;
-      } else if (isInferred) {
-        strokeColor = "#D78A43";
-        strokeDasharray = "5 5";
+        stroke = "#FF6A13";
+        width = 2.5;
+      } else if (e.classification === "EXPERIMENTALLY_SUPPORTED" || e.classification === "OBSERVED") {
+        stroke = "#191C24";
+      } else if (e.classification === "INFERRED") {
+        stroke = "#FF6A13";
+        dash = "5 5";
       } else {
-        strokeColor = "#ECEEF1";
-        strokeDasharray = "2 3";
+        stroke = "#C9CDD4";
+        dash = "2 3";
       }
-
       return {
         id: e.id,
         source: e.source_node_id,
         target: e.target_node_id,
-        type: "bezier",
-        animated: isExpSupported || isPathHighlighted,
+        type: "smoothstep",
+        animated: isPathHighlighted,
         style: {
-          stroke: strokeColor,
-          strokeWidth,
-          strokeDasharray,
-          opacity: highlightedPathEdgeIds.size > 0 && !isPathHighlighted ? 0.25 : 1.0,
+          stroke,
+          strokeWidth: width,
+          strokeDasharray: dash,
+          opacity: highlightedPathEdgeIds.size > 0 && !isPathHighlighted ? 0.25 : 1,
         },
-        markerEnd: {
-          type: MarkerType.ArrowClosed,
-          width: 14,
-          height: 14,
-          color: strokeColor,
-        },
-        label: e.relation_type,
-        labelStyle: {
-          fill: isPathHighlighted ? "#20242D" : "#747B87",
-          fontSize: 9,
-          fontWeight: 600,
-          fontFamily: "monospace",
-        },
-        labelBgStyle: {
-          fill: "#FFFFFF",
-          fillOpacity: 0.95,
-          stroke: "#ECEEF1",
-          strokeWidth: 0.5,
-        },
+        markerEnd: { type: MarkerType.ArrowClosed, width: 14, height: 14, color: stroke },
+        label: e.relation_type.replace(/_/g, " "),
+        labelStyle: { fill: "#747B87", fontSize: 10 },
+        labelBgPadding: [4, 2] as [number, number],
+        labelBgStyle: { fill: "#F8F9FB", fillOpacity: 1 },
       };
     });
   }, [edges, highlightedPathEdgeIds]);
 
-  return (
-    <div className="w-full h-[600px] bg-[#F8F9FB] rounded-2xl border border-[#ECEEF1] relative overflow-hidden shadow-card">
-      {/* Canvas Epistemic Legend Bar */}
-      <div className="absolute top-4 left-4 z-10 bg-white/95 backdrop-blur-sm border border-[#ECEEF1] px-3.5 py-2 rounded-xl shadow-card flex items-center gap-4 text-[11px] font-medium text-[#747B87]">
-        <span className="font-semibold text-[#191C24]">Causal Classification:</span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-0.5 bg-[#191C24]" /> Observed
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-0.5 bg-[#168568]" /> Experimentally Supported
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-0.5 border-t border-dashed border-[#D78A43]" /> Inferred
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-0.5 border-t border-dotted border-[#ECEEF1]" /> Unknown
-        </span>
-      </div>
+  const resetView = useCallback(() => {
+    rf.setViewport({ x: 24, y: 72, zoom: DEFAULT_ZOOM }, { duration: 250 });
+  }, [rf]);
 
+  const fitGraph = useCallback(() => {
+    rf.fitView({ padding: 0.08, minZoom: 0.3, duration: 300 });
+  }, [rf]);
+
+  // Initial viewport once nodes are measured: readable zoom, anchored at the chain start.
+  const onInit = useCallback(() => {
+    if (ready.current) return;
+    ready.current = true;
+    requestAnimationFrame(() => rf.setViewport({ x: 24, y: 72, zoom: DEFAULT_ZOOM }));
+  }, [rf]);
+
+  // Keep the selected node in view at a readable zoom.
+  useEffect(() => {
+    if (!selectedNodeId || !ready.current) return;
+    const n = rf.getNode(selectedNodeId);
+    if (!n) return;
+    rf.setCenter(n.position.x + NODE_W / 2, n.position.y + NODE_H / 2, {
+      zoom: Math.max(rf.getZoom(), DEFAULT_ZOOM),
+      duration: 300,
+    });
+  }, [selectedNodeId, rf]);
+
+  // Frame a traced causal path, without shrinking below a readable zoom.
+  useEffect(() => {
+    if (highlightedPathNodeIds.size === 0 || !ready.current) return;
+    rf.fitView({
+      nodes: Array.from(highlightedPathNodeIds).map((id) => ({ id })),
+      padding: 0.12,
+      minZoom: 0.65,
+      maxZoom: 1,
+      duration: 400,
+    });
+  }, [highlightedPathNodeIds, rf]);
+
+  const toolBtn =
+    "h-8 px-2.5 inline-flex items-center gap-1.5 typo-button text-[#191C24] bg-white border border-[#ECEEF1] rounded-[10px] hover:bg-[#F9FAFB]";
+
+  return (
+    <div className="relative h-full w-full">
+      <div className="absolute top-3 left-3 z-10 hidden lg:flex flex-wrap items-center gap-x-4 gap-y-1 bg-white border border-[#ECEEF1] px-3 py-1.5 rounded-[10px] text-[11px] text-[#747B87]">
+        <span className="flex items-center gap-1.5"><span className="w-3 border-t-2 border-[#191C24]" />Observed / tested</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 border-t-2 border-dashed border-[#FF6A13]" />Inferred</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 border-t-2 border-[#FF6A13]" />Traced path</span>
+      </div>
+      <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+        <button type="button" className={toolBtn} onClick={() => rf.zoomOut({ duration: 150 })} aria-label="Zoom out"><ZoomOut className="w-3.5 h-3.5" /></button>
+        <button type="button" className={toolBtn} onClick={() => rf.zoomIn({ duration: 150 })} aria-label="Zoom in"><ZoomIn className="w-3.5 h-3.5" /></button>
+        <button type="button" className={toolBtn} onClick={fitGraph} aria-label="Fit graph" title="Fit graph"><Maximize2 className="w-3.5 h-3.5" /><span className="hidden sm:inline">Fit graph</span></button>
+        <button type="button" className={toolBtn} onClick={resetView} aria-label="Reset view" title="Reset view"><RotateCcw className="w-3.5 h-3.5" /><span className="hidden sm:inline">Reset view</span></button>
+      </div>
       <ReactFlow
         nodes={flowNodes}
         edges={flowEdges}
         nodeTypes={nodeTypes}
         onNodeClick={(_, node) => onSelectNode(node.data.node as CausalNodeItem)}
-        fitView
-        fitViewOptions={{ padding: 0.15 }}
-        minZoom={0.2}
+        onInit={onInit}
+        defaultViewport={{ x: 24, y: 72, zoom: DEFAULT_ZOOM }}
+        minZoom={0.3}
         maxZoom={1.5}
+        nodesConnectable={false}
+        proOptions={{ hideAttribution: true }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#ECEEF1" />
-        <Controls className="!bg-white !border-[#ECEEF1] !rounded-xl !shadow-card" />
-        <MiniMap
-          nodeColor={(n) => {
-            const dataNode = n.data?.node as CausalNodeItem | undefined;
-            if (dataNode?.severity === "critical") return "#C74747";
-            if (dataNode?.severity === "warning") return "#D78A43";
-            if (dataNode?.severity === "verified") return "#168568";
-            return "#20242D";
-          }}
-          className="!bg-white !border-[#ECEEF1] !rounded-xl !shadow-card !bottom-4 !right-4"
-        />
+        <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#E4E6EA" />
       </ReactFlow>
+    </div>
+  );
+}
+
+export function CausalFlowGraph(props: CausalFlowGraphProps) {
+  return (
+    <div className="w-full h-[560px] min-h-[420px] bg-[#F8F9FB] rounded-[13px] border border-[#ECEEF1] overflow-hidden">
+      <ReactFlowProvider>
+        <GraphCanvas {...props} />
+      </ReactFlowProvider>
     </div>
   );
 }

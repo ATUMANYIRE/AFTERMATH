@@ -319,6 +319,8 @@ async def get_experiment_evidence(id: str, db: AsyncSession = Depends(get_db)):
 
 @router.get("/{id}/ledger", response_model=List[TransactionResponse], summary="Get Actual Persisted Ledger Transactions for Experiment")
 async def get_experiment_ledger(id: str, db: AsyncSession = Depends(get_db)):
+    if not (await db.execute(select(Experiment.id).where(Experiment.id == id))).first():
+        raise HTTPException(status_code=404, detail=f"Experiment '{id}' not found.")
     stmt = (
         select(SyntheticTransaction)
         .where(SyntheticTransaction.experiment_id == id)

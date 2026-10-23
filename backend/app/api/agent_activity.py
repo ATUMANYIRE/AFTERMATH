@@ -7,7 +7,7 @@ from datetime import datetime
 import uuid
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/agent-activity", tags=["Agent Activity Workspace"])
 
 class TriggerAgentRequest(BaseModel):
     release_id: str
-    goal: str
+    goal: str = Field(min_length=3, max_length=2000)
     agent_role: str = "consequence_auditor"
 
 

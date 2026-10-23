@@ -23,8 +23,8 @@ export function SegmentedTabs({
   size = "md",
 }: SegmentedTabsProps) {
   const sizeStyles = {
-    sm: "p-0.5 text-xs",
-    md: "p-1 text-xs",
+    sm: "p-0.5 text-[12px]",
+    md: "p-0.5 text-[12px]",
   }[size];
 
   const itemSizeStyles = {
@@ -34,7 +34,7 @@ export function SegmentedTabs({
 
   return (
     <div
-      className={`inline-flex items-center bg-[#F0F1F3] rounded-xl border border-[#ECEEF1] ${sizeStyles} ${className}`}
+      className={`inline-flex items-center max-w-full overflow-x-auto bg-[#F4F5F7] rounded-[10px] ${sizeStyles} ${className}`}
     >
       {options.map((option) => {
         const isActive = option.id === activeId;
@@ -43,9 +43,9 @@ export function SegmentedTabs({
             key={option.id}
             type="button"
             onClick={() => onChange(option.id)}
-            className={`inline-flex items-center font-medium rounded-lg transition-all duration-150 ${itemSizeStyles} ${
+            className={`inline-flex items-center whitespace-nowrap typo-button rounded-lg transition-all duration-150 ${itemSizeStyles} ${
               isActive
-                ? "bg-white text-[#191C24] shadow-[0_1px_2px_rgba(0,0,0,0.03)] font-medium"
+                ? "bg-white text-[#191C24] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
                 : "text-[#747B87] hover:text-[#191C24]"
             }`}
           >
@@ -53,7 +53,7 @@ export function SegmentedTabs({
             <span>{option.label}</span>
             {option.badge !== undefined && (
               <span
-                className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${
+                className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] ${
                   isActive
                     ? "bg-[#FFF5EC] text-[#FF6A13]"
                     : "bg-[#ECEEF1] text-[#747B87]"

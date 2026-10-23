@@ -7,7 +7,7 @@ test.describe("AFTERMATH End-to-End Grand Tour (Milestone 5 Submission)", () => 
     // -------------------------------------------------------------------------
     // Step 1: Open AFTERMATH Overview (Executive Cockpit)
     // -------------------------------------------------------------------------
-    await page.goto("http://localhost:3000/");
+    await page.goto("/");
     await expect(page.locator("h1")).toContainText("Release Consequence Cockpit");
     await expect(page.locator("text=rel-2026-001").first()).toBeVisible();
     await expect(page.locator("text=Active Consequence Incident")).toBeVisible();
@@ -15,7 +15,7 @@ test.describe("AFTERMATH End-to-End Grand Tour (Milestone 5 Submission)", () => 
     // -------------------------------------------------------------------------
     // Step 2 & 3 & 4: Release Time Machine Consequence Comparison
     // -------------------------------------------------------------------------
-    await page.goto("http://localhost:3000/time-machine");
+    await page.goto("/time-machine");
     await expect(page.locator("h1")).toContainText("Release Time Machine");
     await expect(page.locator("text=Consequence Laboratory").first()).toBeVisible();
     await expect(page.locator("text=INV-PAY-001 Violations")).toBeVisible();
@@ -26,7 +26,7 @@ test.describe("AFTERMATH End-to-End Grand Tour (Milestone 5 Submission)", () => 
     // -------------------------------------------------------------------------
     // Step 5 & 6: Causal Graph & Blast Radius Investigation
     // -------------------------------------------------------------------------
-    await page.goto("http://localhost:3000/investigation");
+    await page.goto("/investigation");
     await expect(page.locator("h1")).toContainText("Causal Graph & Blast Radius");
     await expect(page.getByText("$1,500.00").first()).toBeVisible();
 
@@ -39,7 +39,7 @@ test.describe("AFTERMATH End-to-End Grand Tour (Milestone 5 Submission)", () => 
     // -------------------------------------------------------------------------
     // Step 7, 8, 9, 10: Remediation Studio & Sandbox Pytest
     // -------------------------------------------------------------------------
-    await page.goto("http://localhost:3000/remediation");
+    await page.goto("/remediation");
     await expect(page.locator("h1")).toContainText("Remediation Studio & Fix Verification");
 
     // Inspect patch diff
@@ -54,7 +54,7 @@ test.describe("AFTERMATH End-to-End Grand Tour (Milestone 5 Submission)", () => 
     // -------------------------------------------------------------------------
     // Step 11: Release Superposition & DevSecOps Policy Gates
     // -------------------------------------------------------------------------
-    await page.goto("http://localhost:3000/release-control");
+    await page.goto("/release-control");
     await expect(page.locator("h1")).toContainText("Release Control & Superposition");
 
     // Verify Superposition Tab & Metrics

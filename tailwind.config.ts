@@ -61,13 +61,7 @@ const config: Config = {
         "3xl": "1.25rem",
       },
       fontFamily: {
-        sans: [
-          "var(--font-inter)",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "'Inter'",
-          "sans-serif",
-        ],
+        sans: ["var(--font-inter)", "Inter", "sans-serif"],
         mono: [
           "'SFMono-Regular'",
           "'JetBrains Mono'",

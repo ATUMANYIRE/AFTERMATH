@@ -6,7 +6,7 @@ Models the duplicate-charge / idempotency-race condition vulnerability between v
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 import uuid
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_
 from app.models.synthetic_transaction import SyntheticTransaction
@@ -14,10 +14,10 @@ from app.models.idempotency_record import IdempotencyRecord
 
 
 class PaymentRequest(BaseModel):
-    customer_id: str
-    amount_cents: int
+    customer_id: str = Field(min_length=1, max_length=128)
+    amount_cents: int = Field(gt=0, le=100_000_000)
     currency: str = "USD"
-    idempotency_key: str
+    idempotency_key: str = Field(min_length=1, max_length=256)
     order_id: Optional[str] = None
     experiment_id: Optional[str] = None
     release_variant: str = "vulnerable"  # "vulnerable" or "repaired"

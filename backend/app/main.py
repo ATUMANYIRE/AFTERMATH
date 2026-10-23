@@ -8,6 +8,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.config import settings
+from app.security import WriteAccessMiddleware
 from app.database import engine, Base, AsyncSessionLocal
 from app.api.router import api_router
 from app.api.health import router as health_router
@@ -51,6 +52,9 @@ app = FastAPI(
     version="0.2.0",
     lifespan=lifespan,
 )
+
+# Access boundary for state-changing requests (added first so CORS wraps its responses)
+app.add_middleware(WriteAccessMiddleware)
 
 # CORS configuration
 app.add_middleware(

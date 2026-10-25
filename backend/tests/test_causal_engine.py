@@ -4,18 +4,22 @@ Verifies epistemic classification, graph traversal, cycle handling, bounded dept
 blast radius calculations, and counterfactual comparison.
 """
 import pytest
-from httpx import AsyncClient, ASGITransport
-from app.main import app
-from app.database import AsyncSessionLocal
+from contextlib import asynccontextmanager
 from app.services.causal_engine import CausalGraphEngine
 from app.models.causal_node import CausalNode
 from app.models.causal_edge import CausalEdge
 
 
+@asynccontextmanager
+async def _session(db):
+    """Use the isolated, seeded in-memory test database from conftest (never the development DB)."""
+    yield db
+
+
 @pytest.mark.asyncio
-async def test_causal_graph_baseline_population():
+async def test_causal_graph_baseline_population(test_db):
     """Verifies deterministic causal graph nodes, edges, and epistemic classifications."""
-    async with AsyncSessionLocal() as session:
+    async with _session(test_db) as session:
         graph = await CausalGraphEngine.get_causal_graph(session, "rel-2026-001", variant="vulnerable")
 
         assert graph.release_id == "rel-2026-001"
@@ -34,9 +38,9 @@ async def test_causal_graph_baseline_population():
 
 
 @pytest.mark.asyncio
-async def test_causal_path_tracing():
+async def test_causal_path_tracing(test_db):
     """Verifies directed causal path from code change to duplicate debit consequence."""
-    async with AsyncSessionLocal() as session:
+    async with _session(test_db) as session:
         path = await CausalGraphEngine.trace_causal_path(
             session,
             release_id="rel-2026-001",
@@ -58,9 +62,9 @@ async def test_causal_path_tracing():
 
 
 @pytest.mark.asyncio
-async def test_cycle_handling_and_bounded_traversal():
+async def test_cycle_handling_and_bounded_traversal(test_db):
     """Verifies that cycles in the dependency graph do not cause infinite loops and respect max_depth."""
-    async with AsyncSessionLocal() as session:
+    async with _session(test_db) as session:
         # Trace path with max_depth=1 to confirm early bounding
         bounded_path = await CausalGraphEngine.trace_causal_path(
             session,
@@ -83,9 +87,9 @@ async def test_cycle_handling_and_bounded_traversal():
 
 
 @pytest.mark.asyncio
-async def test_blast_radius_calculation():
+async def test_blast_radius_calculation(test_db):
     """Verifies deterministic blast-radius calculations with direct/downstream services and exposure."""
-    async with AsyncSessionLocal() as session:
+    async with _session(test_db) as session:
         blast = await CausalGraphEngine.calculate_blast_radius(session, "rel-2026-001")
 
         assert blast.release_id == "rel-2026-001"
@@ -99,9 +103,9 @@ async def test_blast_radius_calculation():
 
 
 @pytest.mark.asyncio
-async def test_counterfactual_comparison():
+async def test_counterfactual_comparison(test_db):
     """Verifies side-by-side counterfactual blast radius comparison between vulnerable and repaired releases."""
-    async with AsyncSessionLocal() as session:
+    async with _session(test_db) as session:
         comparison = await CausalGraphEngine.get_counterfactual_comparison(
             session, "rel-2026-001", scenario_id="lost-response-retry"
         )
@@ -116,9 +120,9 @@ async def test_counterfactual_comparison():
 
 
 @pytest.mark.asyncio
-async def test_variant_filtering_in_graph():
+async def test_variant_filtering_in_graph(test_db):
     """Verifies that repaired variant reflects neutralized failure condition and active remediation edges."""
-    async with AsyncSessionLocal() as session:
+    async with _session(test_db) as session:
         vuln_graph = await CausalGraphEngine.get_causal_graph(session, "rel-2026-001", variant="vulnerable")
         rep_graph = await CausalGraphEngine.get_causal_graph(session, "rel-2026-001", variant="repaired")
 
@@ -133,49 +137,54 @@ async def test_variant_filtering_in_graph():
 
 
 @pytest.mark.asyncio
-async def test_api_causal_graph_endpoints():
+async def test_api_causal_graph_endpoints(client):
     """Verifies REST API endpoints for causal graph, blast radius, counterfactuals, and path tracing."""
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        # 1. Causal Graph
-        resp = await client.get("/api/v1/investigation/rel-2026-001/causal-graph?variant=vulnerable")
-        assert resp.status_code == 200
-        data = resp.json()
-        assert data["release_id"] == "rel-2026-001"
-        assert data["total_nodes"] >= 10
-        assert "experimentally_supported_edges" in data
+    # 1. Causal Graph
+    resp = await client.get("/api/v1/investigation/rel-2026-001/causal-graph?variant=vulnerable")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["release_id"] == "rel-2026-001"
+    assert data["total_nodes"] >= 10
+    assert "experimentally_supported_edges" in data
 
-        # 2. Blast Radius
-        resp = await client.get("/api/v1/investigation/rel-2026-001/blast-radius")
-        assert resp.status_code == 200
-        blast = resp.json()
-        assert blast["severity"] == "CRITICAL"
-        assert blast["financial_exposure_usd"] == 1500.0
+    # 2. Blast Radius
+    resp = await client.get("/api/v1/investigation/rel-2026-001/blast-radius")
+    assert resp.status_code == 200
+    blast = resp.json()
+    assert blast["severity"] == "CRITICAL"
+    assert blast["financial_exposure_usd"] == 1500.0
 
-        # 3. Counterfactual Comparison
-        resp = await client.get("/api/v1/investigation/rel-2026-001/counterfactual")
-        assert resp.status_code == 200
-        comp = resp.json()
-        assert comp["eliminated_financial_risk_usd"] >= 1240.0
+    # 3. Counterfactual Comparison
+    resp = await client.get("/api/v1/investigation/rel-2026-001/counterfactual")
+    assert resp.status_code == 200
+    comp = resp.json()
+    assert comp["eliminated_financial_risk_usd"] >= 1240.0
 
-        # 4. Trace Path (GET)
-        resp = await client.get(
-            "/api/v1/investigation/rel-2026-001/trace-path?source_node_id=cnode-code-a8f9c21b&target_node_id=cnode-cons-double-debit"
-        )
-        assert resp.status_code == 200
-        trace = resp.json()
-        assert trace["path_found"] is True
-        assert trace["path_length"] >= 3
+    # 4. Trace Path (GET)
+    resp = await client.get(
+        "/api/v1/investigation/rel-2026-001/trace-path?source_node_id=cnode-code-a8f9c21b&target_node_id=cnode-cons-double-debit"
+    )
+    assert resp.status_code == 200
+    trace = resp.json()
+    assert trace["path_found"] is True
+    assert trace["path_length"] >= 3
 
-        # 5. Trace Path (POST)
-        resp = await client.post(
-            "/api/v1/investigation/rel-2026-001/trace-path",
-            json={
-                "source_node_id": "cnode-code-a8f9c21b",
-                "target_node_id": "cnode-cons-double-debit",
-                "max_depth": 8,
-            },
-        )
-        assert resp.status_code == 200
-        trace_post = resp.json()
-        assert trace_post["path_found"] is True
+    # 5. Trace Path (POST)
+    resp = await client.post(
+        "/api/v1/investigation/rel-2026-001/trace-path",
+        json={
+            "source_node_id": "cnode-code-a8f9c21b",
+            "target_node_id": "cnode-cons-double-debit",
+            "max_depth": 8,
+        },
+    )
+    assert resp.status_code == 200
+    trace_post = resp.json()
+    assert trace_post["path_found"] is True
+
+
+@pytest.mark.asyncio
+async def test_causal_graph_unknown_release_returns_404(client):
+    """Genuinely nonexistent releases must keep returning 404."""
+    resp = await client.get("/api/v1/investigation/rel-does-not-exist/causal-graph?variant=vulnerable")
+    assert resp.status_code == 404

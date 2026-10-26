@@ -31,14 +31,17 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    logger.info("Checking deterministic seed fixtures...")
-    async with AsyncSessionLocal() as session:
-        seeded = await seed_initial_data(session)
-        if seeded:
-            logger.info("Deterministic seed fixtures successfully loaded.")
-        else:
-            logger.info("Seed data already present. Skipping insertion.")
-        await ensure_baseline_remediation(session)
+    if settings.SEED_DEMO_DATA:
+        logger.info("Checking deterministic seed fixtures...")
+        async with AsyncSessionLocal() as session:
+            seeded = await seed_initial_data(session)
+            if seeded:
+                logger.info("Deterministic seed fixtures successfully loaded.")
+            else:
+                logger.info("Seed data already present. Skipping insertion.")
+            await ensure_baseline_remediation(session)
+    else:
+        logger.info("SEED_DEMO_DATA=false: starting without demo fixtures.")
 
     yield
     # Shutdown

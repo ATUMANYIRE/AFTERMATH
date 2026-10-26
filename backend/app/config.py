@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     # SQLite for zero-dep local quickstart, or PostgreSQL for production / Docker Compose
     DATABASE_URL: str = f"sqlite+aiosqlite:///{_DEFAULT_DB_FILE}"
 
+    # Load the built-in demo fixtures (release v2.4.0, seeded experiments, etc.) on startup.
+    # Set SEED_DEMO_DATA=false to start with an empty database.
+    SEED_DEMO_DATA: bool = True
+
     # CORS Configuration
     CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
